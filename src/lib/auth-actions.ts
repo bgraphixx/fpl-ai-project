@@ -3,6 +3,8 @@
 import { AuthError } from "next-auth";
 import { signIn, signOut } from "@/lib/auth";
 import { createUser, EmailInUseError } from "@/lib/user";
+import { sendEmail } from "@/lib/email";
+import { welcomeEmail } from "@/lib/email-templates";
 
 export async function registerAction(
   _prevState: { error: string | null },
@@ -21,6 +23,10 @@ export async function registerAction(
     if (err instanceof EmailInUseError) return { error: err.message };
     throw err;
   }
+
+  // Fire-and-forget welcome email — never blocks registration
+  const { subject, html } = welcomeEmail(email);
+  void sendEmail({ to: { address: email }, subject, html }).catch(console.error);
 
   try {
     await signIn("credentials", { email, password, redirectTo: "/onboarding" });

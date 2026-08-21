@@ -9,6 +9,8 @@ import { buildTransferPrompt } from "@/lib/prompts";
 import { toSquadPlayers } from "@/lib/recommend-helpers";
 import { validateTransfer, computeTransferCost } from "@/lib/fpl-rules";
 import { generateWithValidation, recommendationErrorResponse } from "@/lib/generate-with-validation";
+import { sendEmail } from "@/lib/email";
+import { transferRecommendationEmail } from "@/lib/email-templates";
 
 const requestSchema = z.object({
   gameweek: z.number().int().positive(),
@@ -103,6 +105,16 @@ export async function POST(request: Request) {
       },
     },
   });
+
+  // Fire-and-forget transfer recommendation email
+  if (session.user.email) {
+    const elements = (bootstrap as { elements: { id: number; web_name: string }[] }).elements;
+    const nameById = new Map(elements.map((e) => [e.id, e.web_name]));
+    const outNames = aiResult.transfersOut.map((id) => nameById.get(id) ?? `#${id}`);
+    const inNames = aiResult.transfersIn.map((id) => nameById.get(id) ?? `#${id}`);
+    const { subject, html } = transferRecommendationEmail(session.user.email, gameweek, inNames, outNames, hitCost, aiResult.summary);
+    void sendEmail({ to: { address: session.user.email }, subject, html }).catch(console.error);
+  }
 
   return NextResponse.json({ recommendation, aiResult, hitCost, selfCorrected, incomingPlayers });
 }

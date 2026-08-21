@@ -18,10 +18,10 @@ export async function createUser(email: string, password: string) {
   });
 }
 
-export function linkFplTeam(userId: string, fplTeamId: number) {
+export function linkFplTeam(userId: string, fplTeamId: number, fplTeamName?: string) {
   return prisma.user.update({
     where: { id: userId },
-    data: { fplTeamId },
-    select: { id: true, email: true, fplTeamId: true },
+    data: { fplTeamId, fplTeamName: fplTeamName ?? null },
+    select: { id: true, email: true, fplTeamId: true, fplTeamName: true },
   });
 }

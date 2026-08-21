@@ -8,6 +8,8 @@ import { buildXIPrompt } from "@/lib/prompts";
 import { toSquadPlayers } from "@/lib/recommend-helpers";
 import { validateStartingXI, formationLabel } from "@/lib/fpl-rules";
 import { generateWithValidation, recommendationErrorResponse } from "@/lib/generate-with-validation";
+import { sendEmail } from "@/lib/email";
+import { xiRecommendationEmail } from "@/lib/email-templates";
 import type { SquadPlayer } from "@/types/fpl";
 
 const requestSchema = z.object({
@@ -86,5 +88,15 @@ export async function POST(request: Request) {
     },
   });
 
+  // Fire-and-forget XI recommendation email
+  if (session.user.email) {
+    const elements = (bootstrap as { elements: { id: number; web_name: string }[] }).elements;
+    const captainName = elements.find((e) => e.id === aiResult.captainId)?.web_name ?? "Unknown";
+    const formation = formationLabel(startingXIPlayers);
+    const { subject, html } = xiRecommendationEmail(session.user.email, gameweek, formation, captainName, aiResult.summary);
+    void sendEmail({ to: { address: session.user.email }, subject, html }).catch(console.error);
+  }
+
   return NextResponse.json({ recommendation, aiResult, selfCorrected });
 }
+

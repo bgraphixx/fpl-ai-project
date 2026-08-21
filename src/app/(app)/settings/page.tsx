@@ -31,9 +31,11 @@ export default async function SettingsPage() {
             className="flex items-center justify-between border-b border-border-soft px-4 py-3.5"
           >
             <div>
-              <div className="cap text-[15px] font-semibold">Team ID</div>
+              <div className="cap text-[15px] font-semibold">
+                {user?.fplTeamName ?? "Team ID"}
+              </div>
               <div className="text-[13px] text-text-dim">
-                {user?.fplTeamId ?? "Not linked"}
+                {user?.fplTeamId ? `#${user.fplTeamId}` : "Not linked"}
               </div>
             </div>
             <span className="cap text-sm font-semibold text-accent">Change</span>
