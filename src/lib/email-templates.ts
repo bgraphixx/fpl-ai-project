@@ -103,11 +103,13 @@ export function welcomeEmail(email: string): { subject: string; html: string } {
 
 // ─── Template: Team Linked ──────────────────────────────────────────────────
 
-export function teamLinkedEmail(email: string, teamId: number): { subject: string; html: string } {
+export function teamLinkedEmail(email: string, teamId: number, teamName?: string): { subject: string; html: string } {
+  const displayName = teamName ? `<strong style="color:#b6ff3d;">${escapeHtml(teamName)}</strong> (#${teamId})` : `<strong style="color:#b6ff3d;">#${teamId}</strong>`;
+  const subjectName = teamName ? `${teamName} (#${teamId})` : `#${teamId}`;
   const content = `
     <h1 style="margin:0 0 8px;font-size:24px;font-weight:700;color:#f3f7f4;letter-spacing:0.02em;">Team linked ✓</h1>
     <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#9fb0a6;">
-      Your FPL Team ID <strong style="color:#b6ff3d;">#${teamId}</strong> is now connected. We'll sync your squad automatically each gameweek so the AI always works with your real players.
+      Your FPL team ${displayName} is now connected. We'll sync your squad automatically each gameweek so the AI always works with your real players.
     </p>
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="background-color:#0a0e0c;border:1px solid #1a231e;border-radius:10px;padding:16px 20px;width:100%;">
       <tr>
@@ -119,8 +121,8 @@ export function teamLinkedEmail(email: string, teamId: number): { subject: strin
     ${ctaButton("Go to dashboard →", APP_URL)}
   `;
   return {
-    subject: `Team #${teamId} linked — you're all set`,
-    html: layout(`FPL Team #${teamId} is now connected to your account.`, content),
+    subject: `${subjectName} linked — you're all set`,
+    html: layout(`FPL Team ${subjectName} is now connected to your account.`, content),
   };
 }
 
