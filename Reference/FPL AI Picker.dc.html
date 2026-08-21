@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&family=Barlow+Semi+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<meta name="design_doc_mode" content="canvas">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  .cap { font-family: 'Barlow Condensed', sans-serif; letter-spacing: .04em; }
+  a { color: #b6ff3d; }
+  a:hover { color: #cbff7a; }
+  @keyframes pulseGlow { 0%,100% { opacity:.35; transform:scale(.94);} 50% { opacity:1; transform:scale(1.04);} }
+  @keyframes sweep { 0% { transform:translateX(-100%);} 100% { transform:translateX(220%);} }
+  .dot1 { animation: pulseGlow 1.2s ease-in-out infinite; }
+  .dot2 { animation: pulseGlow 1.2s ease-in-out .2s infinite; }
+  .dot3 { animation: pulseGlow 1.2s ease-in-out .4s infinite; }
+</style>
+</helmet>
+<div style="background:#070a08;background-image:radial-gradient(1200px 600px at 20% -5%, #10201700, #070a08);min-height:100vh;padding:56px 60px 120px;font-family:'Barlow',sans-serif;color:#f3f7f4">
+
+  <div style="max-width:1240px;margin:0 auto 54px">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="width:44px;height:44px;border-radius:11px;background:#b6ff3d;display:flex;align-items:center;justify-content:center;color:#06210a;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:26px">XI</div>
+      <div>
+        <div class="cap" style="font-size:34px;font-weight:700;line-height:1">FPL AI Picker — Screen Catalog</div>
+        <div style="color:#9fb0a6;font-size:15px;margin-top:3px">Mobile-first · dark stadium-night · static screens & key states. Pan and zoom to explore.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== GROUP A — AUTH & ONBOARDING ===================== -->
+  <div style="max-width:1240px;margin:0 auto 12px" class="cap">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <div style="font-size:15px;font-weight:700;color:#b6ff3d;letter-spacing:.14em">A</div>
+      <div style="font-size:26px;font-weight:700">Auth & onboarding</div>
+      <div style="font-family:'Barlow',sans-serif;color:#6b7c72;font-size:14px;letter-spacing:0">Friends-group scale — fast to get through. Linking a Team ID unlocks generation.</div>
+    </div>
+    <div style="height:1px;background:#1a231e;margin-top:10px"></div>
+  </div>
+  <div style="max-width:1240px;margin:0 auto 70px;display:flex;flex-wrap:wrap;gap:40px">
+
+    <!-- A1 Login -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600">
+            <span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 30px">
+            <div style="width:60px;height:60px;border-radius:15px;background:#b6ff3d;display:flex;align-items:center;justify-content:center;color:#06210a;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:34px;margin-bottom:26px">XI</div>
+            <div class="cap" style="font-size:38px;font-weight:700;line-height:.98;margin-bottom:6px">Welcome back</div>
+            <div style="color:#9fb0a6;font-size:15px;margin-bottom:30px">Sign in to pick your gameweek.</div>
+            <label style="font-size:12px;color:#6b7c72;text-transform:uppercase;letter-spacing:.1em;font-weight:600">Email</label>
+            <div style="margin:7px 0 18px;background:#12181500;background:#12181f00;background:#111714;border:1px solid #23302a;border-radius:12px;padding:14px 16px;color:#f3f7f4;font-size:16px">sam@example.com</div>
+            <label style="font-size:12px;color:#6b7c72;text-transform:uppercase;letter-spacing:.1em;font-weight:600">Password</label>
+            <div style="margin:7px 0 8px;background:#111714;border:1px solid #23302a;border-radius:12px;padding:14px 16px;color:#6b7c72;font-size:16px;letter-spacing:3px">••••••••</div>
+            <div style="text-align:right;color:#b6ff3d;font-size:13px;font-weight:600;margin-bottom:24px">Forgot password?</div>
+            <div class="cap" style="background:#b6ff3d;color:#06210a;text-align:center;padding:15px;border-radius:12px;font-size:19px;font-weight:700;letter-spacing:.03em">Sign in</div>
+            <div style="text-align:center;color:#9fb0a6;font-size:14px;margin-top:22px">New here? <span style="color:#b6ff3d;font-weight:600">Create an account</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">A1 · Login</div>
+    </div>
+
+    <!-- A2 Sign up -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600">
+            <span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 30px">
+            <div class="cap" style="font-size:38px;font-weight:700;line-height:.98;margin-bottom:6px">Create account</div>
+            <div style="color:#9fb0a6;font-size:15px;margin-bottom:30px">One minute. Then link your team.</div>
+            <label style="font-size:12px;color:#6b7c72;text-transform:uppercase;letter-spacing:.1em;font-weight:600">Email</label>
+            <div style="margin:7px 0 18px;background:#111714;border:1px solid #23302a;border-radius:12px;padding:14px 16px;color:#6b7c72;font-size:16px">you@example.com</div>
+            <label style="font-size:12px;color:#6b7c72;text-transform:uppercase;letter-spacing:.1em;font-weight:600">Password</label>
+            <div style="margin:7px 0 6px;background:#111714;border:1px solid #23302a;border-radius:12px;padding:14px 16px;color:#6b7c72;font-size:16px">8+ characters</div>
+            <div style="display:flex;gap:6px;margin:0 0 22px">
+              <div style="flex:1;height:4px;border-radius:2px;background:#b6ff3d"></div>
+              <div style="flex:1;height:4px;border-radius:2px;background:#b6ff3d"></div>
+              <div style="flex:1;height:4px;border-radius:2px;background:#23302a"></div>
+            </div>
+            <div class="cap" style="background:#b6ff3d;color:#06210a;text-align:center;padding:15px;border-radius:12px;font-size:19px;font-weight:700;letter-spacing:.03em">Create account</div>
+            <div style="text-align:center;color:#6b7c72;font-size:12px;margin-top:16px;line-height:1.5">By continuing you agree to the terms.<br>Shared AI key — no card required.</div>
+            <div style="text-align:center;color:#9fb0a6;font-size:14px;margin-top:20px">Already have one? <span style="color:#b6ff3d;font-weight:600">Sign in</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">A2 · Sign up</div>
+    </div>
+
+    <!-- A3 Link Team ID -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600">
+            <span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 24px 4px">
+            <span style="color:#9fb0a6;font-size:15px">Step 1 of 1</span>
+            <span style="color:#b6ff3d;font-size:15px;font-weight:600">Skip for now</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 28px">
+            <div class="cap" style="font-size:36px;font-weight:700;line-height:1;margin-bottom:8px">Link your FPL team</div>
+            <div style="color:#9fb0a6;font-size:15px;margin-bottom:26px;line-height:1.5">We'll pull your 15 players automatically so the AI works with your real squad.</div>
+            <label style="font-size:12px;color:#6b7c72;text-transform:uppercase;letter-spacing:.1em;font-weight:600">FPL Team ID</label>
+            <div style="margin:8px 0 14px;background:#111714;border:1px solid #b6ff3d;border-radius:12px;padding:16px;color:#f3f7f4;font-size:22px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px">4 819 275</div>
+            <div style="background:#101613;border:1px solid #23302a;border-radius:14px;padding:16px 16px 18px">
+              <div class="cap" style="font-size:16px;font-weight:700;color:#b6ff3d;margin-bottom:8px">Where do I find this?</div>
+              <div style="color:#9fb0a6;font-size:13.5px;line-height:1.55">On the official site, open <b style="color:#cdd8d1">Pick Team → Points</b>. Your ID is the number in the address bar:</div>
+              <div style="margin-top:10px;background:#0a0e0c;border-radius:8px;padding:9px 11px;font-family:'Barlow',monospace;font-size:12.5px;color:#6b7c72;overflow:hidden;white-space:nowrap">…/entry/<span style="color:#b6ff3d">4819275</span>/event/3</div>
+            </div>
+            <div class="cap" style="margin-top:26px;background:#b6ff3d;color:#06210a;text-align:center;padding:15px;border-radius:12px;font-size:19px;font-weight:700;letter-spacing:.03em">Link team & continue</div>
+          </div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">A3 · Onboarding — link Team ID</div>
+    </div>
+
+    <!-- A4 Not linked prompt -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600">
+            <span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:0 34px">
+            <div style="width:96px;height:96px;border-radius:24px;background:#101613;border:1px dashed #2c3a32;display:flex;align-items:center;justify-content:center;font-size:44px;margin-bottom:24px">🔗</div>
+            <div class="cap" style="font-size:30px;font-weight:700;line-height:1.05;margin-bottom:10px">No team linked yet</div>
+            <div style="color:#9fb0a6;font-size:15px;line-height:1.55;margin-bottom:28px">You can browse the app, but picks, transfers and captaincy all need your squad. Link a Team ID to switch it on.</div>
+            <div class="cap" style="width:100%;background:#b6ff3d;color:#06210a;padding:15px;border-radius:12px;font-size:19px;font-weight:700;letter-spacing:.03em">Link FPL Team ID</div>
+            <div style="color:#6b7c72;font-size:14px;margin-top:16px">Prefer to build one by hand? <span style="color:#b6ff3d;font-weight:600">Enter manually</span></div>
+          </div>
+          <div style="display:flex;justify-content:space-around;align-items:center;padding:14px 0 26px;border-top:1px solid #161d18;color:#6b7c72;font-size:11px">
+            <span style="color:#b6ff3d">◈ Picks</span><span>▦ Squad</span><span>⇄ Transfers</span><span>⚙ Settings</span>
+          </div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">A4 · Empty state — not linked</div>
+    </div>
+
+  </div>
+
+  <!-- ===================== GROUP B — MODE PICKER ===================== -->
+  <div style="max-width:1240px;margin:0 auto 12px" class="cap">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <div style="font-size:15px;font-weight:700;color:#b6ff3d;letter-spacing:.14em">B</div>
+      <div style="font-size:26px;font-weight:700">Mode picker — landing</div>
+      <div style="font-family:'Barlow',sans-serif;color:#6b7c72;font-size:14px;letter-spacing:0">Three entry points + deadline context. Two treatments of how prominent the countdown is.</div>
+    </div>
+    <div style="height:1px;background:#1a231e;margin-top:10px"></div>
+  </div>
+  <div style="max-width:1240px;margin:0 auto 70px;display:flex;flex-wrap:wrap;gap:40px">
+
+    <!-- B1 minimal strip -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600">
+            <span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 22px 8px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:34px;height:34px;border-radius:9px;background:#b6ff3d;display:flex;align-items:center;justify-content:center;color:#06210a;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:19px">XI</div>
+              <div class="cap" style="font-size:20px;font-weight:700">AI Picker</div>
+            </div>
+            <div style="width:34px;height:34px;border-radius:50%;background:#182019;border:1px solid #23302a;display:flex;align-items:center;justify-content:center;font-size:14px;color:#9fb0a6">SM</div>
+          </div>
+          <!-- minimal context strip -->
+          <div style="margin:6px 18px 0;background:#101613;border:1px solid #1c261f;border-radius:12px;padding:11px 15px;display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:13px;color:#9fb0a6"><b class="cap" style="color:#f3f7f4;font-size:15px">GW3</b> active</div>
+            <div style="font-size:13px;color:#9fb0a6">Deadline <b style="color:#ffb23d">Sat 11:30</b> · <span style="color:#ffb23d">1d 22h</span></div>
+          </div>
+          <div style="padding:20px 18px 0">
+            <div class="cap" style="font-size:26px;font-weight:700;line-height:1;margin-bottom:3px">What are we doing?</div>
+            <div style="color:#6b7c72;font-size:14px;margin-bottom:16px">Pick a mode to get an AI recommendation.</div>
+          </div>
+          <div style="padding:0 18px;display:flex;flex-direction:column;gap:12px">
+            <div style="background:linear-gradient(120deg,#123021,#0f2418);border:1px solid #1e7a3c;border-radius:16px;padding:17px 18px;display:flex;gap:14px;align-items:center">
+              <div style="font-size:26px">◈</div>
+              <div style="flex:1"><div class="cap" style="font-size:20px;font-weight:700">Set my XI + captain</div><div style="color:#9fb0a6;font-size:13px">Best starting 11 from your squad</div></div>
+              <div style="color:#b6ff3d;font-size:22px">›</div>
+            </div>
+            <div style="background:#101613;border:1px solid #23302a;border-radius:16px;padding:17px 18px;display:flex;gap:14px;align-items:center">
+              <div style="font-size:26px">⇄</div>
+              <div style="flex:1"><div class="cap" style="font-size:20px;font-weight:700">Suggest transfers</div><div style="color:#9fb0a6;font-size:13px">Who to move on, within your budget</div></div>
+              <div style="color:#6b7c72;font-size:22px">›</div>
+            </div>
+            <div style="background:#101613;border:1px solid #23302a;border-radius:16px;padding:17px 18px;display:flex;gap:14px;align-items:center">
+              <div style="font-size:26px">✦</div>
+              <div style="flex:1"><div class="cap" style="font-size:20px;font-weight:700">Build from scratch</div><div style="color:#9fb0a6;font-size:13px">New team · wildcard · free hit</div></div>
+              <div style="color:#6b7c72;font-size:22px">›</div>
+            </div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="display:flex;justify-content:space-around;align-items:center;padding:14px 0 26px;border-top:1px solid #161d18;color:#6b7c72;font-size:11px">
+            <span style="color:#b6ff3d">◈ Picks</span><span>▦ Squad</span><span>⇄ Transfers</span><span>⚙ Settings</span>
+          </div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">B1 · Minimal context strip</div>
+    </div>
+
+    <!-- B2 prominent countdown -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600">
+            <span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 22px 6px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:34px;height:34px;border-radius:9px;background:#b6ff3d;display:flex;align-items:center;justify-content:center;color:#06210a;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:19px">XI</div>
+              <div class="cap" style="font-size:20px;font-weight:700">AI Picker</div>
+            </div>
+            <div style="width:34px;height:34px;border-radius:50%;background:#182019;border:1px solid #23302a;display:flex;align-items:center;justify-content:center;font-size:14px;color:#9fb0a6">SM</div>
+          </div>
+          <!-- prominent countdown hero -->
+          <div style="margin:8px 18px 0;border-radius:18px;padding:20px 18px;background:linear-gradient(135deg,#14351f,#0c1c13);border:1px solid #1e7a3c;position:relative;overflow:hidden">
+            <div style="position:absolute;inset:0;background:repeating-linear-gradient(90deg,#ffffff08 0 2px,transparent 2px 26px)"></div>
+            <div style="position:relative">
+              <div class="cap" style="font-size:13px;letter-spacing:.16em;color:#b6ff3d;text-transform:uppercase;font-weight:700">GW3 deadline</div>
+              <div class="cap" style="display:flex;align-items:baseline;gap:8px;margin-top:6px">
+                <span style="font-size:52px;font-weight:700;line-height:.9">1<span style="font-size:22px;color:#9fb0a6">d</span> 22<span style="font-size:22px;color:#9fb0a6">h</span> 14<span style="font-size:22px;color:#9fb0a6">m</span></span>
+              </div>
+              <div style="color:#cdd8d1;font-size:14px;margin-top:8px">Sat 11:30 · 8 fixtures · <span style="color:#ffb23d">1 free transfer</span></div>
+            </div>
+          </div>
+          <div style="padding:18px 18px 0">
+            <div class="cap" style="font-size:22px;font-weight:700;line-height:1;margin-bottom:14px">Get a recommendation</div>
+          </div>
+          <div style="padding:0 18px;display:flex;flex-direction:column;gap:11px">
+            <div style="background:linear-gradient(120deg,#123021,#0f2418);border:1px solid #1e7a3c;border-radius:16px;padding:16px 18px;display:flex;gap:14px;align-items:center">
+              <div style="font-size:24px">◈</div>
+              <div style="flex:1"><div class="cap" style="font-size:19px;font-weight:700">Set my XI + captain</div><div style="color:#9fb0a6;font-size:13px">Best starting 11 from your squad</div></div>
+              <div style="color:#b6ff3d;font-size:22px">›</div>
+            </div>
+            <div style="background:#101613;border:1px solid #23302a;border-radius:16px;padding:16px 18px;display:flex;gap:14px;align-items:center">
+              <div style="font-size:24px">⇄</div>
+              <div style="flex:1"><div class="cap" style="font-size:19px;font-weight:700">Suggest transfers</div><div style="color:#9fb0a6;font-size:13px">Who to move on, within your budget</div></div>
+              <div style="color:#6b7c72;font-size:22px">›</div>
+            </div>
+            <div style="background:#101613;border:1px solid #23302a;border-radius:16px;padding:16px 18px;display:flex;gap:14px;align-items:center">
+              <div style="font-size:24px">✦</div>
+              <div style="flex:1"><div class="cap" style="font-size:19px;font-weight:700">Build from scratch</div><div style="color:#9fb0a6;font-size:13px">New team · wildcard · free hit</div></div>
+              <div style="color:#6b7c72;font-size:22px">›</div>
+            </div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="display:flex;justify-content:space-around;align-items:center;padding:14px 0 26px;border-top:1px solid #161d18;color:#6b7c72;font-size:11px">
+            <span style="color:#b6ff3d">◈ Picks</span><span>▦ Squad</span><span>⇄ Transfers</span><span>⚙ Settings</span>
+          </div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">B2 · Prominent countdown hero</div>
+    </div>
+
+  </div>
+  <!-- ===================== GROUP C — SQUAD VIEW ===================== -->
+  <div style="max-width:1240px;margin:0 auto 12px" class="cap">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <div style="font-size:15px;font-weight:700;color:#b6ff3d;letter-spacing:.14em">C</div>
+      <div style="font-size:26px;font-weight:700">Squad view — pitch / table toggle</div>
+      <div style="font-family:'Barlow',sans-serif;color:#6b7c72;font-size:14px;letter-spacing:0">Shared "your squad" context. Toggle is persistent at top, not buried.</div>
+    </div>
+    <div style="height:1px;background:#1a231e;margin-top:10px"></div>
+  </div>
+  <div style="max-width:1240px;margin:0 auto 70px;display:flex;flex-wrap:wrap;gap:40px">
+
+    <!-- C1 Pitch view -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600"><span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:6px 18px 4px">
+            <div style="color:#b6ff3d;font-size:22px">‹</div>
+            <div class="cap" style="font-size:22px;font-weight:700;flex:1">Your squad</div>
+            <div style="color:#9fb0a6;font-size:13px">£1.2m ITB</div>
+          </div>
+          <!-- persistent toggle -->
+          <div style="margin:6px 18px 10px;background:#101613;border:1px solid #23302a;border-radius:11px;padding:3px;display:flex">
+            <div class="cap" style="flex:1;text-align:center;background:#b6ff3d;color:#06210a;border-radius:8px;padding:8px;font-weight:700;font-size:15px">◈ Pitch</div>
+            <div class="cap" style="flex:1;text-align:center;color:#9fb0a6;padding:8px;font-weight:700;font-size:15px">▦ Table</div>
+          </div>
+          <!-- pitch -->
+          <div style="flex:1;margin:0 12px 10px;border-radius:14px;overflow:hidden;position:relative;background:repeating-linear-gradient(#1e7a3c 0 46px,#1a6f36 46px 92px);border:1px solid #14371f">
+            <div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);width:120px;height:56px;border:2px solid #ffffff30;border-top:none"></div>
+            <div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);width:44px;height:44px;border:2px solid #ffffff30;border-radius:50%"></div>
+            <div style="height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:22px 6px 10px">
+              <!-- FWD -->
+              <div style="display:flex;justify-content:space-evenly">
+                <div style="display:flex;flex-direction:column;align-items:center;width:74px"><div style="width:40px;height:40px;border-radius:9px;background:#6cabdd;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#06210a;box-shadow:0 3px 8px rgba(0,0,0,.4)">MCI</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 6px;text-align:center;min-width:64px"><div class="cap" style="font-size:13px;font-weight:600;line-height:1.05">Haaland</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£14.0 · <span style="color:#37c06a">●</span></div></div></div>
+                <div style="display:flex;flex-direction:column;align-items:center;width:74px"><div style="width:40px;height:40px;border-radius:9px;background:#7a003c;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.4)">AVL</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 6px;text-align:center;min-width:64px"><div class="cap" style="font-size:13px;font-weight:600;line-height:1.05">Watkins</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£9.0 · <span style="color:#e07a2a">●</span></div></div></div>
+                <div style="display:flex;flex-direction:column;align-items:center;width:74px"><div style="width:40px;height:40px;border-radius:9px;background:#d71920;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.4)">BOU</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 6px;text-align:center;min-width:64px"><div class="cap" style="font-size:13px;font-weight:600;line-height:1.05">Semenyo</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£7.0 · <span style="color:#37c06a">●</span></div></div></div>
+              </div>
+              <!-- MID -->
+              <div style="display:flex;justify-content:space-evenly">
+                <div style="display:flex;flex-direction:column;align-items:center;width:70px"><div style="width:40px;height:40px;border-radius:9px;background:#d0021b;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.4)">LIV</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 5px;text-align:center;min-width:60px"><div class="cap" style="font-size:12px;font-weight:600;line-height:1.05">Salah</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£14.5 · <span style="color:#37c06a">●</span></div></div></div>
+                <div style="display:flex;flex-direction:column;align-items:center;width:70px"><div style="width:40px;height:40px;border-radius:9px;background:#1c4fd8;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.4)">CHE</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 5px;text-align:center;min-width:60px"><div class="cap" style="font-size:12px;font-weight:600;line-height:1.05">Palmer</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£10.5 · <span style="color:#7a8a80">●</span></div></div></div>
+                <div style="display:flex;flex-direction:column;align-items:center;width:70px"><div style="width:40px;height:40px;border-radius:9px;background:#ef2b3d;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.4)">ARS</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 5px;text-align:center;min-width:60px"><div class="cap" style="font-size:12px;font-weight:600;line-height:1.05">Saka</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£10.0 · <span style="color:#37c06a">●</span></div></div></div>
+                <div style="display:flex;flex-direction:column;align-items:center;width:70px"><div style="width:40px;height:40px;border-radius:9px;background:#da291c;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.4)">MUN</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 5px;text-align:center;min-width:60px"><div class="cap" style="font-size:12px;font-weight:600;line-height:1.05">Fernandes</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£9.0 · <span style="color:#e07a2a">●</span></div></div></div>
+              </div>
+              <!-- DEF -->
+              <div style="display:flex;justify-content:space-evenly">
+                <div style="display:flex;flex-direction:column;align-items:center;width:74px"><div style="width:40px;height:40px;border-radius:9px;background:#ef2b3d;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.4)">ARS</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 6px;text-align:center;min-width:64px"><div class="cap" style="font-size:13px;font-weight:600;line-height:1.05">Gabriel</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£6.3 · <span style="color:#37c06a">●</span></div></div></div>
+                <div style="display:flex;flex-direction:column;align-items:center;width:74px"><div style="width:40px;height:40px;border-radius:9px;background:#ef2b3d;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.4)">ARS</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 6px;text-align:center;min-width:64px"><div class="cap" style="font-size:13px;font-weight:600;line-height:1.05">Saliba</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£6.0 · <span style="color:#37c06a">●</span></div></div></div>
+                <div style="display:flex;flex-direction:column;align-items:center;width:74px"><div style="width:40px;height:40px;border-radius:9px;background:#6cabdd;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#06210a;box-shadow:0 3px 8px rgba(0,0,0,.4)">MCI</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 6px;text-align:center;min-width:64px"><div class="cap" style="font-size:13px;font-weight:600;line-height:1.05">Gvardiol</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£6.2 · <span style="color:#7a8a80">●</span></div></div></div>
+              </div>
+              <!-- GK -->
+              <div style="display:flex;justify-content:center">
+                <div style="display:flex;flex-direction:column;align-items:center;width:74px"><div style="width:40px;height:40px;border-radius:9px;background:#ef2b3d;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.4)">ARS</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 6px;text-align:center;min-width:64px"><div class="cap" style="font-size:13px;font-weight:600;line-height:1.05">Raya</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£5.6 · <span style="color:#37c06a">●</span></div></div></div>
+              </div>
+            </div>
+          </div>
+          <!-- bench -->
+          <div style="margin:0 12px 14px;background:#101613;border:1px solid #23302a;border-radius:12px;padding:9px 10px">
+            <div style="font-size:10px;color:#6b7c72;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:7px">Bench</div>
+            <div style="display:flex;justify-content:space-between;gap:6px">
+              <div style="text-align:center;flex:1"><div class="cap" style="font-size:12px;font-weight:600">Sánchez</div><div style="font-size:10px;color:#9fb0a6">£5.0</div></div>
+              <div style="text-align:center;flex:1"><div class="cap" style="font-size:12px;font-weight:600">Muñoz</div><div style="font-size:10px;color:#9fb0a6">£5.5</div></div>
+              <div style="text-align:center;flex:1"><div class="cap" style="font-size:12px;font-weight:600">Kerkez</div><div style="font-size:10px;color:#9fb0a6">£5.5</div></div>
+              <div style="text-align:center;flex:1"><div class="cap" style="font-size:12px;font-weight:600">Wood</div><div style="font-size:10px;color:#9fb0a6">£7.5</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">C1 · Pitch view (default) · dot = fixture difficulty</div>
+    </div>
+
+    <!-- C2 Table view -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600"><span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:6px 18px 4px">
+            <div style="color:#b6ff3d;font-size:22px">‹</div>
+            <div class="cap" style="font-size:22px;font-weight:700;flex:1">Your squad</div>
+            <div style="color:#9fb0a6;font-size:13px">£1.2m ITB</div>
+          </div>
+          <div style="margin:6px 18px 10px;background:#101613;border:1px solid #23302a;border-radius:11px;padding:3px;display:flex">
+            <div class="cap" style="flex:1;text-align:center;color:#9fb0a6;padding:8px;font-weight:700;font-size:15px">◈ Pitch</div>
+            <div class="cap" style="flex:1;text-align:center;background:#b6ff3d;color:#06210a;border-radius:8px;padding:8px;font-weight:700;font-size:15px">▦ Table</div>
+          </div>
+          <!-- table header -->
+          <div style="margin:0 14px;display:flex;align-items:center;padding:8px 12px;color:#6b7c72;font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;border-bottom:1px solid #1c261f">
+            <span style="flex:1">Player</span>
+            <span style="width:44px;text-align:right;color:#b6ff3d">£ ▾</span>
+            <span style="width:44px;text-align:right">Form</span>
+            <span style="width:38px;text-align:right">Pts</span>
+            <span style="width:46px;text-align:right">Own</span>
+          </div>
+          <div style="flex:1;overflow:hidden;padding:0 14px">
+            <sc-for list="{{ tableRows }}" as="p" hint-placeholder-count="15">
+              <div style="display:flex;align-items:center;padding:3px 12px;border-bottom:1px solid #141b16">
+                <div style="width:26px;height:26px;border-radius:6px;background:{{ p.color }};display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:10px;color:#fff;margin-right:9px">{{ p.club }}</div>
+                <div style="flex:1"><div class="cap" style="font-size:15px;font-weight:600;line-height:1">{{ p.name }}</div><div style="font-size:10px;color:#6b7c72">{{ p.pos }}</div></div>
+                <span class="cap" style="width:44px;text-align:right;font-size:15px;font-weight:600;color:#b6ff3d">{{ p.price }}</span>
+                <span class="cap" style="width:44px;text-align:right;font-size:15px;font-weight:600">{{ p.form }}</span>
+                <span class="cap" style="width:38px;text-align:right;font-size:15px;font-weight:600">{{ p.pts }}</span>
+                <span style="width:46px;text-align:right;font-size:13px;color:#9fb0a6">{{ p.own }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="padding:11px 18px 24px;border-top:1px solid #161d18;display:flex;justify-content:space-between;align-items:center">
+            <span style="color:#6b7c72;font-size:12px">Tap a column to sort</span>
+            <span class="cap" style="background:#182019;border:1px solid #23302a;border-radius:8px;padding:7px 13px;font-size:14px;font-weight:600;color:#b6ff3d">Edit squad</span>
+          </div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">C2 · Table view · sortable (price active)</div>
+    </div>
+
+  </div>
+
+  <!-- ===================== GROUP D — MANUAL EDIT ===================== -->
+  <div style="max-width:1240px;margin:0 auto 12px" class="cap">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <div style="font-size:15px;font-weight:700;color:#b6ff3d;letter-spacing:.14em">D</div>
+      <div style="font-size:26px;font-weight:700">Manual squad edit / override</div>
+      <div style="font-family:'Barlow',sans-serif;color:#6b7c72;font-size:14px;letter-spacing:0">Fix stale auto-pull before generating. Two treatments: modal over squad vs a dedicated screen.</div>
+    </div>
+    <div style="height:1px;background:#1a231e;margin-top:10px"></div>
+  </div>
+  <div style="max-width:1240px;margin:0 auto 70px;display:flex;flex-wrap:wrap;gap:40px">
+
+    <!-- D1 Modal over squad -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600"><span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span></div>
+          <!-- dimmed squad behind -->
+          <div style="position:absolute;inset:0;background:repeating-linear-gradient(#1e7a3c 0 46px,#1a6f36 46px 92px);opacity:.18;margin:52px 12px 220px;border-radius:14px"></div>
+          <div style="position:absolute;inset:0;background:#000000aa"></div>
+          <!-- bottom sheet -->
+          <div style="margin-top:auto;position:relative;background:#0f1512;border:1px solid #23302a;border-bottom:none;border-radius:22px 22px 0 0;padding:14px 16px 22px;box-shadow:0 -20px 40px rgba(0,0,0,.5)">
+            <div style="width:40px;height:4px;border-radius:2px;background:#2c3a32;margin:0 auto 14px"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+              <div class="cap" style="font-size:22px;font-weight:700">Swap player</div>
+              <div style="color:#9fb0a6;font-size:22px">✕</div>
+            </div>
+            <div style="color:#9fb0a6;font-size:13px;margin-bottom:12px">Out: <b style="color:#f3f7f4">Fernandes · MUN · £9.0</b></div>
+            <div style="background:#0a0e0c;border:1px solid #23302a;border-radius:11px;padding:11px 13px;display:flex;align-items:center;gap:9px;margin-bottom:10px">
+              <span style="color:#6b7c72">🔍</span><span style="color:#6b7c72;font-size:15px">Search midfielders under £9.0…</span>
+            </div>
+            <div style="display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap">
+              <span class="cap" style="background:#182019;border:1px solid #23302a;border-radius:20px;padding:5px 12px;font-size:13px;color:#b6ff3d">MID</span>
+              <span class="cap" style="background:#101613;border:1px solid #23302a;border-radius:20px;padding:5px 12px;font-size:13px;color:#9fb0a6">≤ £9.0</span>
+              <span class="cap" style="background:#101613;border:1px solid #23302a;border-radius:20px;padding:5px 12px;font-size:13px;color:#9fb0a6">Form ▾</span>
+            </div>
+            <sc-for list="{{ swapResults }}" as="p" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;padding:10px 4px;border-bottom:1px solid #141b16">
+                <div style="width:30px;height:30px;border-radius:7px;background:{{ p.color }};display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:11px;color:#fff;margin-right:10px">{{ p.club }}</div>
+                <div style="flex:1"><div class="cap" style="font-size:16px;font-weight:600;line-height:1">{{ p.name }}</div><div style="font-size:11px;color:#6b7c72">Form {{ p.form }} · {{ p.own }} owned</div></div>
+                <span class="cap" style="font-size:15px;font-weight:600;color:#b6ff3d;margin-right:12px">{{ p.price }}</span>
+                <span class="cap" style="background:#b6ff3d;color:#06210a;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:700">Swap</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">D1 · Modal over squad (leaning this)</div>
+    </div>
+
+    <!-- D2 Dedicated screen -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600"><span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:6px 18px 8px">
+            <div style="color:#b6ff3d;font-size:22px">‹</div>
+            <div class="cap" style="font-size:22px;font-weight:700;flex:1">Edit squad</div>
+            <div class="cap" style="color:#b6ff3d;font-size:15px;font-weight:600">Done</div>
+          </div>
+          <div style="margin:0 16px 10px;background:#0a0e0c;border:1px solid #23302a;border-radius:11px;padding:12px 13px;display:flex;align-items:center;gap:9px">
+            <span style="color:#b6ff3d">🔍</span><span style="color:#f3f7f4;font-size:15px">isak</span><span style="flex:1"></span><span style="color:#6b7c72">✕</span>
+          </div>
+          <div style="display:flex;gap:7px;padding:0 16px 10px;flex-wrap:wrap">
+            <span class="cap" style="background:#182019;border:1px solid #23302a;border-radius:20px;padding:6px 13px;font-size:13px;color:#9fb0a6">All positions</span>
+            <span class="cap" style="background:#101613;border:1px solid #23302a;border-radius:20px;padding:6px 13px;font-size:13px;color:#9fb0a6">Any price</span>
+            <span class="cap" style="background:#101613;border:1px solid #23302a;border-radius:20px;padding:6px 13px;font-size:13px;color:#9fb0a6">Points ▾</span>
+          </div>
+          <div style="padding:2px 16px 4px;color:#6b7c72;font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:700">4 results</div>
+          <div style="flex:1;overflow:hidden;padding:0 16px">
+            <sc-for list="{{ searchResults }}" as="p" hint-placeholder-count="6">
+              <div style="display:flex;align-items:center;padding:11px 6px;border-bottom:1px solid #141b16">
+                <div style="width:34px;height:34px;border-radius:8px;background:{{ p.color }};display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:12px;color:#fff;margin-right:11px">{{ p.club }}</div>
+                <div style="flex:1"><div class="cap" style="font-size:17px;font-weight:600;line-height:1">{{ p.name }}</div><div style="font-size:11px;color:#6b7c72">{{ p.pos }} · Form {{ p.form }} · {{ p.pts }} pts · {{ p.own }}</div></div>
+                <span class="cap" style="font-size:16px;font-weight:600;color:#b6ff3d;margin-right:12px">{{ p.price }}</span>
+                <span class="cap" style="background:#182019;border:1px solid #b6ff3d;color:#b6ff3d;border-radius:8px;padding:7px 13px;font-size:13px;font-weight:700">+ Add</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="padding:12px 16px 24px;border-top:1px solid #161d18;display:flex;justify-content:space-between;align-items:center">
+            <div><div style="color:#6b7c72;font-size:11px">Squad value</div><div class="cap" style="font-size:18px;font-weight:700">£99.2m · 15/15</div></div>
+            <span class="cap" style="background:#b6ff3d;color:#06210a;border-radius:9px;padding:11px 18px;font-size:15px;font-weight:700">Save changes</span>
+          </div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">D2 · Dedicated screen · search density</div>
+    </div>
+
+  </div>
+
+  <!-- ===================== GROUP E — XI + CAPTAIN FLOW ===================== -->
+  <div style="max-width:1240px;margin:0 auto 12px" class="cap">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <div style="font-size:15px;font-weight:700;color:#b6ff3d;letter-spacing:.14em">E</div>
+      <div style="font-size:26px;font-weight:700">Set XI + captain — flow</div>
+      <div style="font-family:'Barlow',sans-serif;color:#6b7c72;font-size:14px;letter-spacing:0">Confirm → generate → results. Shared shape across all three modes.</div>
+    </div>
+    <div style="height:1px;background:#1a231e;margin-top:10px"></div>
+  </div>
+  <div style="max-width:1240px;margin:0 auto 70px;display:flex;flex-wrap:wrap;gap:40px">
+
+    <!-- E1 Confirm -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600"><span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:6px 18px 8px"><div style="color:#b6ff3d;font-size:22px">‹</div><div class="cap" style="font-size:22px;font-weight:700;flex:1">Confirm squad</div></div>
+          <div style="padding:0 20px">
+            <div style="color:#9fb0a6;font-size:15px;line-height:1.5;margin-bottom:16px">The AI will pick your best starting XI and captain from these 15. Auto-pulled from Team ID <b style="color:#f3f7f4">4819275</b>.</div>
+            <div style="background:#101613;border:1px solid #1e7a3c;border-radius:14px;padding:14px 16px;margin-bottom:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div><div class="cap" style="font-size:18px;font-weight:700">15 players ready</div><div style="color:#6b7c72;font-size:13px">Last synced 4 min ago · GW3</div></div>
+                <div style="color:#37c06a;font-size:26px">✓</div>
+              </div>
+            </div>
+            <div style="background:#101613;border:1px solid #23302a;border-radius:14px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <div><div class="cap" style="font-size:16px;font-weight:700">Formation</div><div style="color:#6b7c72;font-size:13px">Let AI decide vs lock a shape</div></div>
+              <div class="cap" style="background:#182019;border:1px solid #23302a;border-radius:8px;padding:7px 13px;font-size:14px;font-weight:600;color:#b6ff3d">Auto ▾</div>
+            </div>
+            <div style="background:#101613;border:1px solid #23302a;border-radius:14px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
+              <div><div class="cap" style="font-size:16px;font-weight:700">Data looks off?</div><div style="color:#6b7c72;font-size:13px">Edit the squad before generating</div></div>
+              <div class="cap" style="color:#b6ff3d;font-size:14px;font-weight:600">Edit ›</div>
+            </div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="padding:12px 20px 26px">
+            <div class="cap" style="background:#b6ff3d;color:#06210a;text-align:center;padding:16px;border-radius:13px;font-size:20px;font-weight:700;letter-spacing:.03em">Generate my XI + captain</div>
+            <div style="text-align:center;color:#6b7c72;font-size:12px;margin-top:10px">Uses shared AI key · usually ~4s</div>
+          </div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">E1 · Confirm inputs</div>
+    </div>
+
+    <!-- E2 Generating -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600"><span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 34px;text-align:center">
+            <div style="display:flex;gap:12px;margin-bottom:30px">
+              <div class="dot1" style="width:20px;height:20px;border-radius:6px;background:#b6ff3d"></div>
+              <div class="dot2" style="width:20px;height:20px;border-radius:6px;background:#37c06a"></div>
+              <div class="dot3" style="width:20px;height:20px;border-radius:6px;background:#1e7a3c"></div>
+            </div>
+            <div class="cap" style="font-size:30px;font-weight:700;line-height:1.05;margin-bottom:10px">Reading your gameweek</div>
+            <div style="color:#9fb0a6;font-size:15px;line-height:1.55;margin-bottom:30px">Weighing form, fixtures and minutes across your 15 players.</div>
+            <div style="width:100%;max-width:260px;display:flex;flex-direction:column;gap:12px;text-align:left">
+              <div style="display:flex;align-items:center;gap:11px;color:#cdd8d1;font-size:14px"><span style="color:#37c06a">✓</span> Pulled squad & prices</div>
+              <div style="display:flex;align-items:center;gap:11px;color:#cdd8d1;font-size:14px"><span style="color:#37c06a">✓</span> Scored fixture difficulty</div>
+              <div style="display:flex;align-items:center;gap:11px;color:#f3f7f4;font-size:14px;font-weight:600"><span class="dot1" style="color:#b6ff3d">◈</span> Choosing captain…</div>
+            </div>
+            <div style="margin-top:34px;width:100%;max-width:260px;height:6px;border-radius:3px;background:#141b16;overflow:hidden;position:relative">
+              <div style="position:absolute;top:0;left:0;height:100%;width:40%;background:linear-gradient(90deg,#1e7a3c,#b6ff3d);border-radius:3px;animation:sweep 1.4s ease-in-out infinite"></div>
+            </div>
+            <div style="color:#6b7c72;font-size:12px;margin-top:14px">Model: primary · falls back automatically if busy</div>
+          </div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">E2 · Generating (thinking)</div>
+    </div>
+
+    <!-- E3 Results pitch with C/V -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600"><span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:6px 18px 4px"><div style="color:#b6ff3d;font-size:22px">‹</div><div class="cap" style="font-size:21px;font-weight:700;flex:1">Recommended XI</div><div class="cap" style="background:#182019;border:1px solid #23302a;border-radius:8px;padding:6px 10px;font-size:13px;color:#b6ff3d">3-4-3</div></div>
+          <div style="margin:2px 18px 8px;background:#101613;border:1px solid #1e7a3c;border-radius:11px;padding:9px 13px;font-size:13px;color:#cdd8d1;line-height:1.4">Captain <b style="color:#ff3d81">Haaland</b> — home to a bottom-6 defence, highest projected ceiling this week.</div>
+          <div style="flex:1;margin:0 12px 10px;border-radius:14px;overflow:hidden;position:relative;background:repeating-linear-gradient(#1e7a3c 0 46px,#1a6f36 46px 92px);border:1px solid #14371f">
+            <div style="height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:16px 6px 10px">
+              <div style="display:flex;justify-content:space-evenly">
+                <div style="position:relative;display:flex;flex-direction:column;align-items:center;width:74px"><div style="position:absolute;top:-6px;right:14px;width:20px;height:20px;border-radius:50%;background:#ff3d81;color:#fff;font-family:'Barlow Condensed';font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;z-index:2">C</div><div style="width:40px;height:40px;border-radius:9px;background:#6cabdd;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#06210a">MCI</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 6px;text-align:center;min-width:64px"><div class="cap" style="font-size:13px;font-weight:600;line-height:1.05">Haaland</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£14.0</div></div></div>
+                <div style="display:flex;flex-direction:column;align-items:center;width:74px"><div style="width:40px;height:40px;border-radius:9px;background:#7a003c;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#fff">AVL</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 6px;text-align:center;min-width:64px"><div class="cap" style="font-size:13px;font-weight:600;line-height:1.05">Watkins</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£9.0</div></div></div>
+                <div style="display:flex;flex-direction:column;align-items:center;width:74px"><div style="width:40px;height:40px;border-radius:9px;background:#d71920;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#fff">BOU</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 6px;text-align:center;min-width:64px"><div class="cap" style="font-size:13px;font-weight:600;line-height:1.05">Semenyo</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£7.0</div></div></div>
+              </div>
+              <div style="display:flex;justify-content:space-evenly">
+                <div style="position:relative;display:flex;flex-direction:column;align-items:center;width:70px"><div style="position:absolute;top:-6px;right:9px;width:20px;height:20px;border-radius:50%;background:#3dd6ff;color:#06210a;font-family:'Barlow Condensed';font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;z-index:2">V</div><div style="width:40px;height:40px;border-radius:9px;background:#d0021b;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#fff">LIV</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 5px;text-align:center;min-width:60px"><div class="cap" style="font-size:12px;font-weight:600;line-height:1.05">Salah</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£14.5</div></div></div>
+                <div style="display:flex;flex-direction:column;align-items:center;width:70px"><div style="width:40px;height:40px;border-radius:9px;background:#1c4fd8;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#fff">CHE</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 5px;text-align:center;min-width:60px"><div class="cap" style="font-size:12px;font-weight:600;line-height:1.05">Palmer</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£10.5</div></div></div>
+                <div style="display:flex;flex-direction:column;align-items:center;width:70px"><div style="width:40px;height:40px;border-radius:9px;background:#ef2b3d;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#fff">ARS</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 5px;text-align:center;min-width:60px"><div class="cap" style="font-size:12px;font-weight:600;line-height:1.05">Saka</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£10.0</div></div></div>
+                <div style="display:flex;flex-direction:column;align-items:center;width:70px"><div style="width:40px;height:40px;border-radius:9px;background:#da291c;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#fff">MUN</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 5px;text-align:center;min-width:60px"><div class="cap" style="font-size:12px;font-weight:600;line-height:1.05">Fernandes</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£9.0</div></div></div>
+              </div>
+              <div style="display:flex;justify-content:space-evenly">
+                <div style="display:flex;flex-direction:column;align-items:center;width:74px"><div style="width:40px;height:40px;border-radius:9px;background:#ef2b3d;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#fff">ARS</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 6px;text-align:center;min-width:64px"><div class="cap" style="font-size:13px;font-weight:600;line-height:1.05">Gabriel</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£6.3</div></div></div>
+                <div style="display:flex;flex-direction:column;align-items:center;width:74px"><div style="width:40px;height:40px;border-radius:9px;background:#ef2b3d;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#fff">ARS</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 6px;text-align:center;min-width:64px"><div class="cap" style="font-size:13px;font-weight:600;line-height:1.05">Saliba</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£6.0</div></div></div>
+                <div style="display:flex;flex-direction:column;align-items:center;width:74px"><div style="width:40px;height:40px;border-radius:9px;background:#6cabdd;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#06210a">MCI</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 6px;text-align:center;min-width:64px"><div class="cap" style="font-size:13px;font-weight:600;line-height:1.05">Gvardiol</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£6.2</div></div></div>
+              </div>
+              <div style="display:flex;justify-content:center">
+                <div style="display:flex;flex-direction:column;align-items:center;width:74px"><div style="width:40px;height:40px;border-radius:9px;background:#ef2b3d;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#fff">ARS</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 6px;text-align:center;min-width:64px"><div class="cap" style="font-size:13px;font-weight:600;line-height:1.05">Raya</div><div style="font-size:10px;color:#b6ff3d;font-weight:600">£5.6</div></div></div>
+              </div>
+            </div>
+          </div>
+          <div style="margin:0 12px 6px;font-size:11px;color:#6b7c72;text-transform:uppercase;letter-spacing:.12em;font-weight:700;padding-left:4px">Bench (in order)</div>
+          <div style="margin:0 12px 16px;display:flex;gap:7px">
+            <div style="flex:1;background:#101613;border:1px solid #23302a;border-radius:9px;padding:7px;text-align:center"><div class="cap" style="font-size:12px;font-weight:600">Sánchez</div><div style="font-size:10px;color:#6b7c72">GK</div></div>
+            <div style="flex:1;background:#101613;border:1px solid #23302a;border-radius:9px;padding:7px;text-align:center"><div class="cap" style="font-size:12px;font-weight:600">Wood</div><div style="font-size:10px;color:#6b7c72">1</div></div>
+            <div style="flex:1;background:#101613;border:1px solid #23302a;border-radius:9px;padding:7px;text-align:center"><div class="cap" style="font-size:12px;font-weight:600">Muñoz</div><div style="font-size:10px;color:#6b7c72">2</div></div>
+            <div style="flex:1;background:#101613;border:1px solid #23302a;border-radius:9px;padding:7px;text-align:center"><div class="cap" style="font-size:12px;font-weight:600">Kerkez</div><div style="font-size:10px;color:#6b7c72">3</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">E3 · Results — XI, C/V badges, bench</div>
+    </div>
+
+  </div>
+
+  <!-- ===================== GROUP F — TRANSFERS FLOW ===================== -->
+  <div style="max-width:1240px;margin:0 auto 12px" class="cap">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <div style="font-size:15px;font-weight:700;color:#b6ff3d;letter-spacing:.14em">F</div>
+      <div style="font-size:26px;font-weight:700">Suggest transfers — flow</div>
+      <div style="font-family:'Barlow',sans-serif;color:#6b7c72;font-size:14px;letter-spacing:0">Out→in pairs. Point-hit cost called out prominently when the AI takes one.</div>
+    </div>
+    <div style="height:1px;background:#1a231e;margin-top:10px"></div>
+  </div>
+  <div style="max-width:1240px;margin:0 auto 70px;display:flex;flex-wrap:wrap;gap:40px">
+
+    <!-- F1 Confirm -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600"><span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:6px 18px 8px"><div style="color:#b6ff3d;font-size:22px">‹</div><div class="cap" style="font-size:22px;font-weight:700;flex:1">Confirm inputs</div></div>
+          <div style="padding:0 20px">
+            <div style="display:flex;gap:12px;margin-bottom:14px">
+              <div style="flex:1;background:#101613;border:1px solid #23302a;border-radius:14px;padding:15px 16px"><div style="color:#6b7c72;font-size:12px;text-transform:uppercase;letter-spacing:.1em;font-weight:700">Free transfers</div><div class="cap" style="font-size:34px;font-weight:700;line-height:1;margin-top:4px">1</div></div>
+              <div style="flex:1;background:#101613;border:1px solid #23302a;border-radius:14px;padding:15px 16px"><div style="color:#6b7c72;font-size:12px;text-transform:uppercase;letter-spacing:.1em;font-weight:700">In the bank</div><div class="cap" style="font-size:34px;font-weight:700;line-height:1;margin-top:4px">£1.2m</div></div>
+            </div>
+            <div style="background:#101613;border:1px solid #23302a;border-radius:14px;padding:15px 16px;margin-bottom:14px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="cap" style="font-size:16px;font-weight:700">Allow point hits?</div><div class="cap" style="background:#1e7a3c;border-radius:20px;padding:4px 4px 4px 12px;display:flex;align-items:center;gap:8px;font-size:13px;color:#06210a;font-weight:700">Yes<span style="width:20px;height:20px;border-radius:50%;background:#06210a;display:inline-block"></span></div></div>
+              <div style="color:#9fb0a6;font-size:13px;line-height:1.5">If a −4 clearly pays off, the AI can suggest it. Cost is always shown up front.</div>
+            </div>
+            <div style="background:#101613;border:1px solid #23302a;border-radius:14px;padding:15px 16px;display:flex;justify-content:space-between;align-items:center"><div class="cap" style="font-size:16px;font-weight:700">Reviewing squad</div><div class="cap" style="color:#b6ff3d;font-size:14px;font-weight:600">View 15 ›</div></div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="padding:12px 20px 26px"><div class="cap" style="background:#b6ff3d;color:#06210a;text-align:center;padding:16px;border-radius:13px;font-size:20px;font-weight:700;letter-spacing:.03em">Suggest transfers</div></div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">F1 · Confirm — transfers & hits</div>
+    </div>
+
+    <!-- F2 Results out->in -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600"><span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:6px 18px 8px"><div style="color:#b6ff3d;font-size:22px">‹</div><div class="cap" style="font-size:22px;font-weight:700;flex:1">Suggested transfers</div></div>
+          <!-- point hit callout -->
+          <div style="margin:0 18px 14px;background:linear-gradient(120deg,#3a1520,#241016);border:1px solid #ff3d81;border-radius:13px;padding:13px 15px;display:flex;align-items:center;gap:13px">
+            <div class="cap" style="font-size:30px;font-weight:700;color:#ff3d81;line-height:1">−4</div>
+            <div><div class="cap" style="font-size:16px;font-weight:700">Takes a 2nd transfer</div><div style="color:#e6b8c6;font-size:13px;line-height:1.4">Projected +9.6 pts over 3 GWs — clears the hit.</div></div>
+          </div>
+          <div style="padding:0 18px;display:flex;flex-direction:column;gap:14px">
+            <!-- pair 1 -->
+            <div style="background:#101613;border:1px solid #23302a;border-radius:14px;padding:14px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="flex:1;display:flex;align-items:center;gap:9px;opacity:.75"><div style="width:32px;height:32px;border-radius:8px;background:#da291c;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:11px;color:#fff">MUN</div><div><div class="cap" style="font-size:15px;font-weight:600;line-height:1">Fernandes</div><div style="font-size:11px;color:#ff5d52">OUT · £9.0</div></div></div>
+                <div style="color:#b6ff3d;font-size:20px">→</div>
+                <div style="flex:1;display:flex;align-items:center;gap:9px"><div style="width:32px;height:32px;border-radius:8px;background:#da291c;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:11px;color:#fff">MUN</div><div><div class="cap" style="font-size:15px;font-weight:600;line-height:1">Mbeumo</div><div style="font-size:11px;color:#37c06a">IN · £8.0</div></div></div>
+              </div>
+              <div style="margin-top:11px;color:#9fb0a6;font-size:13px;line-height:1.45;border-top:1px solid #1c261f;padding-top:10px">Fernandes' underlying numbers have dipped; Mbeumo out-shoots him and frees £1.0m. Two green fixtures next.</div>
+            </div>
+            <!-- pair 2 -->
+            <div style="background:#101613;border:1px solid #23302a;border-radius:14px;padding:14px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="flex:1;display:flex;align-items:center;gap:9px;opacity:.75"><div style="width:32px;height:32px;border-radius:8px;background:#dd0000;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:11px;color:#fff">NFO</div><div><div class="cap" style="font-size:15px;font-weight:600;line-height:1">Wood</div><div style="font-size:11px;color:#ff5d52">OUT · £7.5</div></div></div>
+                <div style="color:#b6ff3d;font-size:20px">→</div>
+                <div style="flex:1;display:flex;align-items:center;gap:9px"><div style="width:32px;height:32px;border-radius:8px;background:#d0021b;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:11px;color:#fff">LIV</div><div><div class="cap" style="font-size:15px;font-weight:600;line-height:1">Ekitike</div><div style="font-size:11px;color:#37c06a">IN · £8.5</div></div></div>
+              </div>
+              <div style="margin-top:11px;color:#9fb0a6;font-size:13px;line-height:1.45;border-top:1px solid #1c261f;padding-top:10px">Wood's fixtures turn hard for a month. Ekitike is nailed and on penalties — the upgrade that justifies the hit.</div>
+            </div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="padding:12px 18px 24px;display:flex;gap:10px">
+            <div class="cap" style="flex:1;background:#182019;border:1px solid #23302a;color:#f3f7f4;text-align:center;padding:14px;border-radius:12px;font-size:16px;font-weight:700">Regenerate</div>
+            <div class="cap" style="flex:1.4;background:#b6ff3d;color:#06210a;text-align:center;padding:14px;border-radius:12px;font-size:16px;font-weight:700">Make transfers</div>
+          </div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">F2 · Results — out→in + hit callout</div>
+    </div>
+
+  </div>
+
+  <!-- ===================== GROUP G — BUILD FROM SCRATCH ===================== -->
+  <div style="max-width:1240px;margin:0 auto 12px" class="cap">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <div style="font-size:15px;font-weight:700;color:#b6ff3d;letter-spacing:.14em">G</div>
+      <div style="font-size:26px;font-weight:700">Build from scratch — flow</div>
+      <div style="font-family:'Barlow',sans-serif;color:#6b7c72;font-size:14px;letter-spacing:0">Budget → generate → full 15. Result reuses the pitch/table toggle for consistency.</div>
+    </div>
+    <div style="height:1px;background:#1a231e;margin-top:10px"></div>
+  </div>
+  <div style="max-width:1240px;margin:0 auto 70px;display:flex;flex-wrap:wrap;gap:40px">
+
+    <!-- G1 Budget -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600"><span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:6px 18px 8px"><div style="color:#b6ff3d;font-size:22px">‹</div><div class="cap" style="font-size:22px;font-weight:700;flex:1">Build a squad</div></div>
+          <div style="padding:0 20px">
+            <div style="color:#9fb0a6;font-size:15px;line-height:1.5;margin-bottom:18px">A full 15 from nothing — new team, wildcard or free hit.</div>
+            <div style="background:#101613;border:1px solid #23302a;border-radius:16px;padding:18px 18px 20px;margin-bottom:14px">
+              <div style="color:#6b7c72;font-size:12px;text-transform:uppercase;letter-spacing:.1em;font-weight:700">Budget</div>
+              <div class="cap" style="font-size:48px;font-weight:700;line-height:1;margin:4px 0 14px">£100.0<span style="font-size:24px;color:#9fb0a6">m</span></div>
+              <div style="height:6px;border-radius:3px;background:#141b16;position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:100%;background:linear-gradient(90deg,#1e7a3c,#b6ff3d);border-radius:3px"></div><div style="position:absolute;right:-2px;top:50%;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;background:#b6ff3d;border:3px solid #0a0e0c"></div></div>
+              <div style="display:flex;justify-content:space-between;color:#6b7c72;font-size:12px;margin-top:8px"><span>£90m</span><span>£100m</span></div>
+            </div>
+            <div style="display:flex;gap:10px">
+              <div class="cap" style="flex:1;background:#182019;border:1px solid #1e7a3c;color:#b6ff3d;text-align:center;padding:13px;border-radius:12px;font-size:15px;font-weight:700">New team</div>
+              <div class="cap" style="flex:1;background:#101613;border:1px solid #23302a;color:#9fb0a6;text-align:center;padding:13px;border-radius:12px;font-size:15px;font-weight:700">Wildcard</div>
+              <div class="cap" style="flex:1;background:#101613;border:1px solid #23302a;color:#9fb0a6;text-align:center;padding:13px;border-radius:12px;font-size:15px;font-weight:700">Free hit</div>
+            </div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="padding:12px 20px 26px"><div class="cap" style="background:#b6ff3d;color:#06210a;text-align:center;padding:16px;border-radius:13px;font-size:20px;font-weight:700;letter-spacing:.03em">Build my squad</div></div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">G1 · Budget confirm</div>
+    </div>
+
+    <!-- G2 Result table -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600"><span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:6px 18px 4px"><div style="color:#b6ff3d;font-size:22px">‹</div><div class="cap" style="font-size:21px;font-weight:700;flex:1">Your new squad</div><div style="color:#9fb0a6;font-size:13px">£99.5m</div></div>
+          <div style="margin:6px 18px 10px;background:#101613;border:1px solid #23302a;border-radius:11px;padding:3px;display:flex">
+            <div class="cap" style="flex:1;text-align:center;color:#9fb0a6;padding:8px;font-weight:700;font-size:15px">◈ Pitch</div>
+            <div class="cap" style="flex:1;text-align:center;background:#b6ff3d;color:#06210a;border-radius:8px;padding:8px;font-weight:700;font-size:15px">▦ Table</div>
+          </div>
+          <div style="margin:0 18px 8px;background:#101613;border:1px solid #1e7a3c;border-radius:11px;padding:9px 13px;font-size:13px;color:#cdd8d1;line-height:1.4">Balanced 3-5-2 base: two premiums (Salah, Haaland) funded by value defenders. £0.5m left for flexibility.</div>
+          <div style="margin:0 14px;display:flex;align-items:center;padding:7px 12px;color:#6b7c72;font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;border-bottom:1px solid #1c261f"><span style="flex:1">Player</span><span style="width:44px;text-align:right;color:#b6ff3d">£ ▾</span><span style="width:44px;text-align:right">Form</span><span style="width:38px;text-align:right">Pts</span></div>
+          <div style="flex:1;overflow:hidden;padding:0 14px">
+            <sc-for list="{{ tableRows }}" as="p" hint-placeholder-count="15">
+              <div style="display:flex;align-items:center;padding:3px 12px;border-bottom:1px solid #141b16">
+                <div style="width:26px;height:26px;border-radius:6px;background:{{ p.color }};display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:10px;color:#fff;margin-right:9px">{{ p.club }}</div>
+                <div style="flex:1"><div class="cap" style="font-size:15px;font-weight:600;line-height:1">{{ p.name }}</div><div style="font-size:10px;color:#6b7c72">{{ p.pos }}</div></div>
+                <span class="cap" style="width:44px;text-align:right;font-size:15px;font-weight:600;color:#b6ff3d">{{ p.price }}</span>
+                <span class="cap" style="width:44px;text-align:right;font-size:15px;font-weight:600">{{ p.form }}</span>
+                <span class="cap" style="width:38px;text-align:right;font-size:15px;font-weight:600">{{ p.pts }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="padding:12px 18px 24px;border-top:1px solid #161d18;display:flex;gap:10px">
+            <div class="cap" style="flex:1;background:#182019;border:1px solid #23302a;color:#f3f7f4;text-align:center;padding:13px;border-radius:12px;font-size:15px;font-weight:700">Regenerate</div>
+            <div class="cap" style="flex:1.3;background:#b6ff3d;color:#06210a;text-align:center;padding:13px;border-radius:12px;font-size:15px;font-weight:700">Use this squad</div>
+          </div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">G2 · Result — full 15 (table view)</div>
+    </div>
+
+  </div>
+
+  <!-- ===================== GROUP H — REASONING REVEAL ===================== -->
+  <div style="max-width:1240px;margin:0 auto 12px" class="cap">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <div style="font-size:15px;font-weight:700;color:#b6ff3d;letter-spacing:.14em">H</div>
+      <div style="font-size:26px;font-weight:700">Reasoning detail — three patterns</div>
+      <div style="font-family:'Barlow',sans-serif;color:#6b7c72;font-size:14px;letter-spacing:0">Summary shows by default. Compare reveal patterns against pitch vs table before locking one.</div>
+    </div>
+    <div style="height:1px;background:#1a231e;margin-top:10px"></div>
+  </div>
+  <div style="max-width:1240px;margin:0 auto 30px;display:flex;flex-wrap:wrap;gap:40px">
+
+    <!-- H1 inline accordion on table -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600"><span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:6px 18px 6px"><div style="color:#b6ff3d;font-size:22px">‹</div><div class="cap" style="font-size:21px;font-weight:700;flex:1">Recommended XI</div><div style="color:#6b7c72;font-size:12px">Table</div></div>
+          <div style="flex:1;overflow:hidden;padding:0 16px">
+            <!-- collapsed row -->
+            <div style="display:flex;align-items:center;padding:11px 6px;border-bottom:1px solid #141b16"><div style="width:30px;height:30px;border-radius:7px;background:#6cabdd;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:11px;color:#06210a;margin-right:10px">MCI</div><div style="flex:1"><div class="cap" style="font-size:16px;font-weight:600;line-height:1">Haaland <span style="color:#ff3d81">(C)</span></div><div style="font-size:12px;color:#9fb0a6">Highest ceiling — home to a bottom-6 defence.</div></div><div style="color:#6b7c72;font-size:18px">⌄</div></div>
+            <!-- expanded row -->
+            <div style="background:#0d1310;border:1px solid #1e7a3c;border-radius:12px;margin:8px 0;overflow:hidden">
+              <div style="display:flex;align-items:center;padding:11px 12px"><div style="width:30px;height:30px;border-radius:7px;background:#d0021b;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:11px;color:#fff;margin-right:10px">LIV</div><div style="flex:1"><div class="cap" style="font-size:16px;font-weight:600;line-height:1">Salah <span style="color:#3dd6ff">(V)</span></div><div style="font-size:12px;color:#9fb0a6">Safe captaincy floor if Haaland's fixture flips.</div></div><div style="color:#b6ff3d;font-size:18px">⌃</div></div>
+              <div style="padding:0 14px 14px;color:#cdd8d1;font-size:13px;line-height:1.55;border-top:1px solid #17251b;margin:0 2px;padding-top:11px">
+                <b style="color:#f3f7f4">Why vice, not captain:</b> Salah's underlying numbers are elite but he's away to a mid-table side that concedes little at home. Model gives him a marginally lower ceiling than Haaland this week but the highest floor in your squad — the right insurance armband.
+                <div style="display:flex;gap:14px;margin-top:11px"><span style="color:#6b7c72">xGI <b style="color:#b6ff3d">0.71</b></span><span style="color:#6b7c72">Form <b style="color:#b6ff3d">7.8</b></span><span style="color:#6b7c72">FDR <b style="color:#e07a2a">3</b></span></div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;padding:11px 6px;border-bottom:1px solid #141b16"><div style="width:30px;height:30px;border-radius:7px;background:#1c4fd8;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:11px;color:#fff;margin-right:10px">CHE</div><div style="flex:1"><div class="cap" style="font-size:16px;font-weight:600;line-height:1">Palmer</div><div style="font-size:12px;color:#9fb0a6">On all set pieces — floor raiser.</div></div><div style="color:#6b7c72;font-size:18px">⌄</div></div>
+            <div style="display:flex;align-items:center;padding:11px 6px;border-bottom:1px solid #141b16"><div style="width:30px;height:30px;border-radius:7px;background:#ef2b3d;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:11px;color:#fff;margin-right:10px">ARS</div><div style="flex:1"><div class="cap" style="font-size:16px;font-weight:600;line-height:1">Saka</div><div style="font-size:12px;color:#9fb0a6">Explosive ceiling vs a leaky right side.</div></div><div style="color:#6b7c72;font-size:18px">⌄</div></div>
+          </div>
+          <div style="padding:12px 18px 24px;border-top:1px solid #161d18;text-align:center;color:#6b7c72;font-size:13px">Tap any row to expand its reasoning</div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">H1 · Inline accordion — reads well in table</div>
+    </div>
+
+    <!-- H2 bottom sheet on pitch -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600"><span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:6px 18px 6px"><div style="color:#b6ff3d;font-size:22px">‹</div><div class="cap" style="font-size:21px;font-weight:700;flex:1">Recommended XI</div><div style="color:#6b7c72;font-size:12px">Pitch</div></div>
+          <!-- pitch fragment (top rows) dimmed under sheet -->
+          <div style="flex:1;margin:0 12px;border-radius:14px 14px 0 0;overflow:hidden;position:relative;background:repeating-linear-gradient(#1e7a3c 0 46px,#1a6f36 46px 92px)">
+            <div style="padding:20px 6px;display:flex;justify-content:space-evenly">
+              <div style="display:flex;flex-direction:column;align-items:center"><div style="width:40px;height:40px;border-radius:9px;background:#6cabdd;border:2px solid #b6ff3d;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#06210a">MCI</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 6px;text-align:center"><div class="cap" style="font-size:12px;font-weight:600">Haaland</div></div></div>
+              <div style="display:flex;flex-direction:column;align-items:center"><div style="width:40px;height:40px;border-radius:9px;background:#7a003c;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#fff">AVL</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 6px;text-align:center"><div class="cap" style="font-size:12px;font-weight:600">Watkins</div></div></div>
+              <div style="display:flex;flex-direction:column;align-items:center"><div style="width:40px;height:40px;border-radius:9px;background:#d71920;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#fff">BOU</div><div style="margin-top:4px;background:#0a0e0cdd;border-radius:6px;padding:2px 6px;text-align:center"><div class="cap" style="font-size:12px;font-weight:600">Semenyo</div></div></div>
+            </div>
+            <div style="position:absolute;inset:0;background:#000000aa"></div>
+          </div>
+          <!-- bottom sheet -->
+          <div style="position:relative;background:#0f1512;border:1px solid #23302a;border-radius:22px 22px 0 0;padding:14px 18px 22px;box-shadow:0 -20px 40px rgba(0,0,0,.6);margin-top:-160px">
+            <div style="width:40px;height:4px;border-radius:2px;background:#2c3a32;margin:0 auto 14px"></div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+              <div style="width:44px;height:44px;border-radius:10px;background:#6cabdd;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:14px;color:#06210a">MCI</div>
+              <div style="flex:1"><div class="cap" style="font-size:22px;font-weight:700;line-height:1">Haaland <span style="color:#ff3d81;font-size:16px">Captain</span></div><div style="color:#9fb0a6;font-size:13px">Forward · £14.0 · 58% owned</div></div>
+              <div style="color:#9fb0a6;font-size:20px">✕</div>
+            </div>
+            <div style="display:flex;gap:8px;margin:12px 0 14px">
+              <div style="flex:1;background:#0a0e0c;border:1px solid #1c261f;border-radius:10px;padding:9px;text-align:center"><div style="color:#6b7c72;font-size:11px">xG/90</div><div class="cap" style="font-size:19px;font-weight:700;color:#b6ff3d">0.94</div></div>
+              <div style="flex:1;background:#0a0e0c;border:1px solid #1c261f;border-radius:10px;padding:9px;text-align:center"><div style="color:#6b7c72;font-size:11px">Form</div><div class="cap" style="font-size:19px;font-weight:700">7.2</div></div>
+              <div style="flex:1;background:#0a0e0c;border:1px solid #1c261f;border-radius:10px;padding:9px;text-align:center"><div style="color:#6b7c72;font-size:11px">Next FDR</div><div class="cap" style="font-size:19px;font-weight:700;color:#37c06a">2</div></div>
+            </div>
+            <div style="color:#cdd8d1;font-size:14px;line-height:1.6"><b style="color:#f3f7f4">Why captain:</b> Home to a side that's conceded in every away game and sits bottom-6 for shots faced. Haaland leads your squad on both xG and penalty share — the clear ceiling play. Salah takes the vice as the safer floor.</div>
+            <div class="cap" style="margin-top:16px;background:#182019;border:1px solid #23302a;color:#b6ff3d;text-align:center;padding:12px;border-radius:11px;font-size:15px;font-weight:700">Make vice-captain instead</div>
+          </div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">H2 · Bottom sheet — natural for pitch taps</div>
+    </div>
+
+    <!-- H3 detail screen -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600"><span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:6px 18px 8px"><div style="color:#b6ff3d;font-size:22px">‹</div><div class="cap" style="font-size:20px;font-weight:700;flex:1">Pick detail</div></div>
+          <div style="padding:0 20px;flex:1;overflow:hidden">
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+              <div style="width:64px;height:64px;border-radius:14px;background:#6cabdd;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:18px;color:#06210a">MCI</div>
+              <div><div class="cap" style="font-size:28px;font-weight:700;line-height:1">Haaland</div><div style="color:#9fb0a6;font-size:14px">Forward · Man City · £14.0</div><div class="cap" style="display:inline-block;margin-top:6px;background:#ff3d81;color:#fff;border-radius:6px;padding:2px 9px;font-size:13px;font-weight:700">CAPTAIN</div></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:18px">
+              <div style="flex:1;background:#101613;border:1px solid #1c261f;border-radius:11px;padding:11px;text-align:center"><div style="color:#6b7c72;font-size:11px">xG/90</div><div class="cap" style="font-size:22px;font-weight:700;color:#b6ff3d">0.94</div></div>
+              <div style="flex:1;background:#101613;border:1px solid #1c261f;border-radius:11px;padding:11px;text-align:center"><div style="color:#6b7c72;font-size:11px">Form</div><div class="cap" style="font-size:22px;font-weight:700">7.2</div></div>
+              <div style="flex:1;background:#101613;border:1px solid #1c261f;border-radius:11px;padding:11px;text-align:center"><div style="color:#6b7c72;font-size:11px">Pts</div><div class="cap" style="font-size:22px;font-weight:700">34</div></div>
+              <div style="flex:1;background:#101613;border:1px solid #1c261f;border-radius:11px;padding:11px;text-align:center"><div style="color:#6b7c72;font-size:11px">FDR</div><div class="cap" style="font-size:22px;font-weight:700;color:#37c06a">2</div></div>
+            </div>
+            <div class="cap" style="font-size:16px;font-weight:700;margin-bottom:8px;color:#b6ff3d">The AI's case</div>
+            <div style="color:#cdd8d1;font-size:14px;line-height:1.65">Home to a bottom-6 defence that has conceded in every away fixture this season. Haaland leads your squad on xG and takes City's penalties, giving him both the highest floor and ceiling available for the armband.<br><br>Salah is the vice: elite underlying numbers but a tougher away trip caps his ceiling slightly this week. If City's match is postponed, the armband falls to him automatically.</div>
+            <div style="margin-top:16px;background:#101613;border:1px solid #1c261f;border-radius:12px;padding:13px 15px"><div style="color:#6b7c72;font-size:12px;margin-bottom:6px">Next 3 fixtures</div><div style="display:flex;gap:8px"><span class="cap" style="background:#37c06a;color:#06210a;border-radius:6px;padding:4px 12px;font-size:14px;font-weight:700">BUR (H)</span><span class="cap" style="background:#7a8a80;color:#fff;border-radius:6px;padding:4px 12px;font-size:14px;font-weight:700">WOL (A)</span><span class="cap" style="background:#37c06a;color:#06210a;border-radius:6px;padding:4px 12px;font-size:14px;font-weight:700">LUT (H)</span></div></div>
+          </div>
+          <div style="padding:12px 20px 24px;border-top:1px solid #161d18"><div class="cap" style="background:#b6ff3d;color:#06210a;text-align:center;padding:14px;border-radius:12px;font-size:17px;font-weight:700">Back to XI</div></div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">H3 · Detail screen — most room, extra tap</div>
+    </div>
+
+  </div>
+  <div style="max-width:1240px;margin:0 auto 70px;background:#0d1310;border:1px solid #1e7a3c;border-radius:14px;padding:16px 20px;color:#cdd8d1;font-size:14px;line-height:1.6">
+    <b class="cap" style="color:#b6ff3d;font-size:16px">Recommendation to test:</b> the answer likely differs by view. Accordion (H1) fits the table's linear rows; a bottom sheet (H2) sits more naturally over spatially-placed pitch cards; the detail screen (H3) is best reserved for a deliberate deep-dive. Suggested default: <b style="color:#f3f7f4">table → inline accordion, pitch → bottom sheet</b>, with the full detail screen reachable from either.
+  </div>
+
+  <!-- ===================== GROUP I — STATES ===================== -->
+  <div style="max-width:1240px;margin:0 auto 12px" class="cap">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <div style="font-size:15px;font-weight:700;color:#b6ff3d;letter-spacing:.14em">I</div>
+      <div style="font-size:26px;font-weight:700">States — empty, error, invalid</div>
+      <div style="font-family:'Barlow',sans-serif;color:#6b7c72;font-size:14px;letter-spacing:0">Honest failures with a retry, never a silent blank.</div>
+    </div>
+    <div style="height:1px;background:#1a231e;margin-top:10px"></div>
+  </div>
+  <div style="max-width:1240px;margin:0 auto 70px;display:flex;flex-wrap:wrap;gap:40px">
+
+    <!-- I1 empty no squad data -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600"><span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 34px">
+            <div style="width:96px;height:96px;border-radius:24px;background:#101613;border:1px dashed #2c3a32;display:flex;align-items:center;justify-content:center;font-size:42px;margin-bottom:22px">◵</div>
+            <div class="cap" style="font-size:28px;font-weight:700;line-height:1.1;margin-bottom:10px">No squad yet</div>
+            <div style="color:#9fb0a6;font-size:15px;line-height:1.55;margin-bottom:26px">Your team is linked, but FPL hasn't recorded a squad for this gameweek yet — common pre-season or for a brand-new team.</div>
+            <div class="cap" style="width:100%;background:#b6ff3d;color:#06210a;padding:15px;border-radius:12px;font-size:18px;font-weight:700">Build one from scratch</div>
+            <div style="color:#6b7c72;font-size:14px;margin-top:14px">or <span style="color:#b6ff3d;font-weight:600">enter 15 manually</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">I1 · Empty — linked, no squad data</div>
+    </div>
+
+    <!-- I2 FPL API error -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600"><span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 34px">
+            <div style="width:96px;height:96px;border-radius:24px;background:#241016;border:1px solid #ffb23d55;display:flex;align-items:center;justify-content:center;font-size:44px;margin-bottom:22px">⚠</div>
+            <div class="cap" style="font-size:28px;font-weight:700;line-height:1.1;margin-bottom:10px">Couldn't reach FPL</div>
+            <div style="color:#9fb0a6;font-size:15px;line-height:1.55;margin-bottom:8px">We couldn't pull your squad — the official FPL service isn't responding right now.</div>
+            <div style="color:#6b7c72;font-size:13px;margin-bottom:26px">This is on their side, not yours. Usually brief.</div>
+            <div class="cap" style="width:100%;background:#b6ff3d;color:#06210a;padding:15px;border-radius:12px;font-size:18px;font-weight:700">Try again</div>
+            <div style="color:#6b7c72;font-size:14px;margin-top:14px">Last good sync: <span style="color:#9fb0a6">GW3, 12 min ago</span> · <span style="color:#b6ff3d;font-weight:600">use cached squad</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">I2 · Error — FPL API unreachable</div>
+    </div>
+
+    <!-- I3 all models rate-limited -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600"><span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 34px">
+            <div style="width:96px;height:96px;border-radius:24px;background:#241016;border:1px solid #ff5d5255;display:flex;align-items:center;justify-content:center;font-size:44px;margin-bottom:22px">⛔</div>
+            <div class="cap" style="font-size:28px;font-weight:700;line-height:1.1;margin-bottom:10px">Models are busy</div>
+            <div style="color:#9fb0a6;font-size:15px;line-height:1.55;margin-bottom:18px">We tried the primary model and two fallbacks — all are rate-limited right now. Nothing was charged and your squad is untouched.</div>
+            <div style="width:100%;background:#101613;border:1px solid #23302a;border-radius:11px;padding:10px 13px;margin-bottom:24px;text-align:left">
+              <div style="display:flex;justify-content:space-between;font-size:13px;color:#9fb0a6;padding:3px 0"><span>Primary</span><span style="color:#ff5d52">rate-limited</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;color:#9fb0a6;padding:3px 0"><span>Fallback A</span><span style="color:#ff5d52">rate-limited</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;color:#9fb0a6;padding:3px 0"><span>Fallback B (free)</span><span style="color:#ff5d52">timed out</span></div>
+            </div>
+            <div class="cap" style="width:100%;background:#b6ff3d;color:#06210a;padding:15px;border-radius:12px;font-size:18px;font-weight:700">Retry in 30s</div>
+            <div style="color:#6b7c72;font-size:14px;margin-top:14px">We'll auto-retry once when a model frees up.</div>
+          </div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">I3 · Error — all fallbacks failed</div>
+    </div>
+
+    <!-- I4 invalid recommendation -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600"><span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:6px 18px 8px"><div style="color:#b6ff3d;font-size:22px">‹</div><div class="cap" style="font-size:21px;font-weight:700;flex:1">Recommended XI</div></div>
+          <!-- self-corrected banner -->
+          <div style="margin:0 18px 12px;background:#1c2116;border:1px solid #ffb23d66;border-radius:12px;padding:12px 14px;display:flex;gap:11px;align-items:flex-start">
+            <div style="font-size:20px">↻</div>
+            <div><div class="cap" style="font-size:15px;font-weight:700;color:#ffb23d">We caught and fixed one thing</div><div style="color:#cdd8d1;font-size:13px;line-height:1.45;margin-top:2px">The first draft broke a squad rule (too many from one club). We re-ran automatically — this XI is valid.</div></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 30px">
+            <div style="width:72px;height:72px;border-radius:18px;background:#0d1310;border:1px solid #1e7a3c;display:flex;align-items:center;justify-content:center;font-size:34px;color:#37c06a;margin-bottom:18px">✓</div>
+            <div class="cap" style="font-size:24px;font-weight:700;margin-bottom:8px">Valid XI ready</div>
+            <div style="color:#9fb0a6;font-size:14px;line-height:1.55;margin-bottom:22px">The validator confirmed formation, budget and club limits before showing you anything.</div>
+            <div class="cap" style="width:100%;background:#b6ff3d;color:#06210a;padding:14px;border-radius:12px;font-size:17px;font-weight:700">View the XI</div>
+            <div style="color:#6b7c72;font-size:13px;margin-top:12px">Draft rejected: 4× Arsenal (max 3)</div>
+          </div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">I4 · Invalid draft — retried & fixed</div>
+    </div>
+
+  </div>
+
+  <!-- ===================== GROUP J — SETTINGS ===================== -->
+  <div style="max-width:1240px;margin:0 auto 12px" class="cap">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <div style="font-size:15px;font-weight:700;color:#b6ff3d;letter-spacing:.14em">J</div>
+      <div style="font-size:26px;font-weight:700">Settings / account</div>
+      <div style="font-family:'Barlow',sans-serif;color:#6b7c72;font-size:14px;letter-spacing:0">Change Team ID, basic account. No AI key entry, no notifications in v1.</div>
+    </div>
+    <div style="height:1px;background:#1a231e;margin-top:10px"></div>
+  </div>
+  <div style="max-width:1240px;margin:0 auto 20px;display:flex;flex-wrap:wrap;gap:40px">
+
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div style="width:380px;border:9px solid #1b211d;border-radius:42px;background:#05070a;box-shadow:0 30px 60px -22px rgba(0,0,0,.75);overflow:hidden">
+        <div style="background:#0a0e0c;border-radius:33px;height:812px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:600"><span>9:41</span><span style="letter-spacing:2px">● ● ● ▮</span></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:6px 18px 12px"><div style="color:#b6ff3d;font-size:22px">‹</div><div class="cap" style="font-size:22px;font-weight:700;flex:1">Settings</div></div>
+          <div style="padding:0 18px">
+            <div style="display:flex;align-items:center;gap:14px;background:#101613;border:1px solid #23302a;border-radius:14px;padding:15px;margin-bottom:18px">
+              <div style="width:48px;height:48px;border-radius:50%;background:#182019;border:1px solid #23302a;display:flex;align-items:center;justify-content:center;color:#9fb0a6;font-family:'Barlow Condensed';font-weight:700">SM</div>
+              <div style="flex:1"><div class="cap" style="font-size:18px;font-weight:700">Sam Mercer</div><div style="color:#6b7c72;font-size:13px">sam@example.com</div></div>
+            </div>
+            <div style="color:#6b7c72;font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin:0 4px 8px">FPL team</div>
+            <div style="background:#101613;border:1px solid #23302a;border-radius:14px;overflow:hidden;margin-bottom:18px">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 16px;border-bottom:1px solid #1a231e"><div><div class="cap" style="font-size:16px;font-weight:600">Team ID</div><div style="color:#6b7c72;font-size:13px">4819275 · synced 4 min ago</div></div><div class="cap" style="color:#b6ff3d;font-size:14px;font-weight:600">Change</div></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 16px"><div class="cap" style="font-size:16px;font-weight:600">Re-sync squad now</div><div style="color:#9fb0a6;font-size:18px">↻</div></div>
+            </div>
+            <div style="color:#6b7c72;font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin:0 4px 8px">Account</div>
+            <div style="background:#101613;border:1px solid #23302a;border-radius:14px;overflow:hidden">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 16px;border-bottom:1px solid #1a231e"><div class="cap" style="font-size:16px;font-weight:600">Change password</div><div style="color:#6b7c72;font-size:18px">›</div></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 16px;border-bottom:1px solid #1a231e"><div class="cap" style="font-size:16px;font-weight:600">Email</div><div style="color:#6b7c72;font-size:13px">sam@example.com</div></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 16px"><div class="cap" style="font-size:16px;font-weight:600;color:#ff5d52">Sign out</div><div style="color:#6b7c72;font-size:18px">›</div></div>
+            </div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="text-align:center;color:#6b7c72;font-size:12px;padding:0 0 26px">AI Picker v1.0 · shared key · not affiliated with the official game</div>
+        </div>
+      </div>
+      <div class="cap" style="color:#9fb0a6;font-size:15px;font-weight:600">J1 · Settings / account</div>
+    </div>
+
+  </div>
+
+  <!--board-end--></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const tableRows = [
+      { name: 'Salah',     club: 'LIV', color: '#d0021b', pos: 'MID', price: '£14.5', form: '7.8', pts: '38', own: '61%' },
+      { name: 'Haaland',   club: 'MCI', color: '#6cabdd', pos: 'FWD', price: '£14.0', form: '7.2', pts: '34', own: '58%' },
+      { name: 'Palmer',    club: 'CHE', color: '#1c4fd8', pos: 'MID', price: '£10.5', form: '5.4', pts: '24', own: '41%' },
+      { name: 'Saka',      club: 'ARS', color: '#ef2b3d', pos: 'MID', price: '£10.0', form: '6.1', pts: '27', own: '33%' },
+      { name: 'Watkins',   club: 'AVL', color: '#7a003c', pos: 'FWD', price: '£9.0',  form: '4.9', pts: '19', own: '18%' },
+      { name: 'Fernandes', club: 'MUN', color: '#da291c', pos: 'MID', price: '£9.0',  form: '3.6', pts: '16', own: '22%' },
+      { name: 'Wood',      club: 'NFO', color: '#dd0000', pos: 'FWD', price: '£7.5',  form: '5.1', pts: '21', own: '14%' },
+      { name: 'Semenyo',   club: 'BOU', color: '#d71920', pos: 'MID', price: '£7.0',  form: '6.4', pts: '26', own: '29%' },
+      { name: 'Gabriel',   club: 'ARS', color: '#ef2b3d', pos: 'DEF', price: '£6.3',  form: '5.0', pts: '22', own: '31%' },
+      { name: 'Gvardiol',  club: 'MCI', color: '#6cabdd', pos: 'DEF', price: '£6.2',  form: '4.2', pts: '18', own: '19%' },
+      { name: 'Saliba',    club: 'ARS', color: '#ef2b3d', pos: 'DEF', price: '£6.0',  form: '4.8', pts: '20', own: '27%' },
+      { name: 'Raya',      club: 'ARS', color: '#ef2b3d', pos: 'GK',  price: '£5.6',  form: '4.5', pts: '19', own: '24%' },
+      { name: 'Muñoz',     club: 'CRY', color: '#1b458f', pos: 'DEF', price: '£5.5',  form: '4.1', pts: '17', own: '16%' },
+      { name: 'Kerkez',    club: 'LIV', color: '#d0021b', pos: 'DEF', price: '£5.5',  form: '3.9', pts: '15', own: '11%' },
+      { name: 'Sánchez',   club: 'CHE', color: '#1c4fd8', pos: 'GK',  price: '£5.0',  form: '3.4', pts: '13', own: '9%'  },
+    ];
+    const swapResults = [
+      { name: 'Mbeumo',  club: 'MUN', color: '#da291c', price: '£8.0', form: '6.9', own: '24%' },
+      { name: 'Semenyo', club: 'BOU', color: '#d71920', price: '£7.0', form: '6.4', own: '29%' },
+      { name: 'Gakpo',   club: 'LIV', color: '#d0021b', price: '£7.5', form: '5.8', own: '17%' },
+      { name: 'Rogers',  club: 'AVL', color: '#7a003c', price: '£7.0', form: '5.5', own: '13%' },
+    ];
+    const searchResults = [
+      { name: 'Isak',     club: 'LIV', color: '#d0021b', pos: 'FWD', price: '£10.5', form: '6.2', pts: '25', own: '34% owned' },
+      { name: 'A. Isak',  club: 'NEW', color: '#111111', pos: 'FWD', price: '£9.5',  form: '5.1', pts: '20', own: '12% owned' },
+      { name: 'Isidor',   club: 'SUN', color: '#e00',    pos: 'FWD', price: '£5.5',  form: '4.4', pts: '17', own: '6% owned'  },
+      { name: 'Ismaila',  club: 'BRE', color: '#e30613', pos: 'MID', price: '£6.0',  form: '4.0', pts: '15', own: '4% owned'  },
+    ];
+    return { tableRows, swapResults, searchResults };
+  }
+}
+</script>
+</body>
+</html>

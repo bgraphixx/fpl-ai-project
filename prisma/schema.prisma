@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SquadSource {
+  auto
+  manual
+}
+
+enum RecommendationMode {
+  xi
+  transfer
+  build
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  fplTeamId    Int?
+  createdAt    DateTime @default(now())
+
+  squadSnapshots  SquadSnapshot[]
+  recommendations Recommendation[]
+}
+
+model SquadSnapshot {
+  id         String      @id @default(cuid())
+  userId     String
+  gameweek   Int
+  players    Json
+  bank       Decimal     @db.Decimal(4, 1)
+  teamValue  Decimal     @db.Decimal(4, 1)
+  source     SquadSource
+  createdAt  DateTime    @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, gameweek])
+}
+
+model Recommendation {
+  id           String             @id @default(cuid())
+  userId       String
+  gameweek     Int
+  mode         RecommendationMode
+  inputSignals Json
+  modelUsed    String
+  summary      Json
+  detail       Json
+  createdAt    DateTime           @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, gameweek])
+}
+
+model FplCache {
+  key       String   @id
+  payload   Json
+  fetchedAt DateTime @default(now())
+  expiresAt DateTime
+}

@@ -1,0 +1,108 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { PitchFormation } from "@/components/PitchFormation";
+import { SquadTable } from "@/components/SquadTable";
+import { PlayerDetailPanel, type PlayerDetail } from "@/components/PlayerDetailPanel";
+import type { DisplayPlayer } from "@/types/ui";
+import type { CurrentSquad } from "@/lib/squad";
+
+function toDetail(p: DisplayPlayer): PlayerDetail {
+  return {
+    id: p.id,
+    name: p.name,
+    club: p.club,
+    position: p.position,
+    price: p.price,
+    badge: p.isCaptain ? "CAPTAIN" : p.isViceCaptain ? "VICE" : undefined,
+    stats: [
+      { label: "Form", value: p.form?.toFixed(1) ?? "–" },
+      { label: "Owned", value: p.ownership ? `${p.ownership.toFixed(0)}%` : "–" },
+      {
+        label: "Status",
+        value: p.availability === "available" ? "Fit" : p.availability === "doubtful" ? "Doubt" : "Out",
+        tone: p.availability === "available" ? "success" : p.availability === "doubtful" ? "warning" : undefined,
+      },
+    ],
+    reasoning:
+      p.availability === "unavailable"
+        ? `${p.name} is currently flagged as unavailable — check the latest news before relying on them this gameweek.`
+        : `${p.name}'s recent form and ownership at a glance. Full AI reasoning is available from the recommendation flows.`,
+  };
+}
+
+export function SquadView({ squad }: { squad: CurrentSquad }) {
+  const [view, setView] = useState<"pitch" | "table">("pitch");
+  const [detail, setDetail] = useState<PlayerDetail | null>(null);
+
+  const all = [...squad.starting, ...squad.bench];
+
+  return (
+    <div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-8">
+      <div className="flex flex-1 flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <h1 className="cap text-2xl font-bold">Your squad</h1>
+          <div className="flex items-center gap-3 text-sm text-text-muted">
+            <span>£{squad.bank.toFixed(1)}m ITB</span>
+            <Link href="/squad/edit" className="cap font-semibold text-accent">
+              Edit ›
+            </Link>
+          </div>
+        </div>
+
+        <div className="flex gap-1 rounded-xl border border-border bg-surface-2 p-1">
+          <button
+            onClick={() => setView("pitch")}
+            className={`cap flex-1 rounded-lg py-2 text-[15px] font-bold ${
+              view === "pitch" ? "bg-accent text-accent-ink" : "text-text-muted"
+            }`}
+            type="button"
+          >
+            ◈ Pitch
+          </button>
+          <button
+            onClick={() => setView("table")}
+            className={`cap flex-1 rounded-lg py-2 text-[15px] font-bold ${
+              view === "table" ? "bg-accent text-accent-ink" : "text-text-muted"
+            }`}
+            type="button"
+          >
+            ▦ Table
+          </button>
+        </div>
+
+        {view === "pitch" ? (
+          <>
+            <PitchFormation
+              players={squad.starting}
+              onSelectPlayer={(p) => setDetail(toDetail(p))}
+            />
+            <div className="rounded-xl border border-border bg-surface-2 p-2.5">
+              <div className="mb-1.5 px-1 text-[10px] font-bold uppercase tracking-wider text-text-dim">
+                Bench
+              </div>
+              <div className="flex justify-between gap-1.5">
+                {squad.bench.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => setDetail(toDetail(p))}
+                    className="flex-1 text-center"
+                    type="button"
+                  >
+                    <div className="cap truncate text-xs font-semibold">{p.name}</div>
+                    <div className="text-[10px] text-text-muted">£{p.price.toFixed(1)}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
+        ) : (
+          <SquadTable players={all} onSelectPlayer={(p) => setDetail(toDetail(p))} />
+        )}
+      </div>
+
+      <PlayerDetailPanel detail={detail} onClose={() => setDetail(null)} />
+    </div>
+  );
+}
