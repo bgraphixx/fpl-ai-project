@@ -9,7 +9,7 @@ export function ViewToggle({
     <div className="flex gap-1 rounded-xl border border-border bg-surface-2 p-1">
       <button
         onClick={() => onChange("pitch")}
-        className={`cap flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-[15px] font-bold ${
+        className={`cap flex-1 flex items-center justify-center gap-2 whitespace-nowrap rounded-lg px-3 py-1.5 text-[15px] font-bold ${
           view === "pitch" ? "bg-accent text-accent-ink" : "text-text-muted"
         }`}
         type="button"
@@ -29,11 +29,11 @@ export function ViewToggle({
           <path d="M12 5v14" />
           <circle cx="12" cy="12" r="3" />
         </svg>
-        <span className="hidden sm:inline">Pitch</span>
+        <span>Pitch</span>
       </button>
       <button
         onClick={() => onChange("table")}
-        className={`cap flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-[15px] font-bold ${
+        className={`cap flex-1 flex items-center justify-center gap-2 whitespace-nowrap rounded-lg px-3 py-1.5 text-[15px] font-bold ${
           view === "table" ? "bg-accent text-accent-ink" : "text-text-muted"
         }`}
         type="button"
@@ -55,7 +55,7 @@ export function ViewToggle({
           <path d="M9 3v18" />
           <path d="M15 3v18" />
         </svg>
-        <span className="hidden sm:inline">Table</span>
+        <span>Table</span>
       </button>
     </div>
   );

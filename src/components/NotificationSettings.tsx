@@ -63,12 +63,12 @@ function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: 
     >
       <span className="cap text-[15px] font-semibold">{label}</span>
       <span
-        className={`relative h-6 w-11 rounded-full transition-colors ${checked ? "bg-accent" : "bg-surface"}`}
+        className={`relative inline-block shrink-0 rounded-full transition-colors ${checked ? "bg-accent" : "bg-surface"}`}
+        style={{ height: 24, width: 44 }}
       >
         <span
-          className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform ${
-            checked ? "translate-x-5" : "translate-x-0.5"
-          }`}
+          className="absolute top-0.5 block rounded-full bg-white transition-transform"
+          style={{ height: 20, width: 20, transform: checked ? "translateX(22px)" : "translateX(2px)" }}
         />
       </span>
     </button>
