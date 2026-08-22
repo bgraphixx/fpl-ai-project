@@ -23,8 +23,6 @@ export function RegisterForm() {
       </Button>
       <p className="mt-3.5 text-center text-xs leading-relaxed text-text-dim">
         By continuing you agree to the terms.
-        <br />
-        Shared AI key — no card required.
       </p>
       <p className="mt-5 text-center text-sm text-text-muted">
         Already have one?{" "}

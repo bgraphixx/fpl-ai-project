@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { ClubBadge } from "@/components/ClubBadge";
+import { FixtureChips } from "@/components/FixtureChips";
 import type { DisplayPlayer } from "@/types/ui";
 import type { Position } from "@/types/fpl";
 
@@ -24,9 +25,11 @@ const POSITION_ORDER: { key: Position; label: string }[] = [
 export function SquadTable({
   players,
   onSelectPlayer,
+  fixturesCount = 0,
 }: {
   players: DisplayPlayer[];
   onSelectPlayer?: (player: DisplayPlayer) => void;
+  fixturesCount?: 0 | 1 | 3;
 }) {
   const [sortKey, setSortKey] = useState<SortKey>("price");
 
@@ -75,7 +78,12 @@ export function SquadTable({
                 <ClubBadge club={p.club} size={28} className="mr-2.5" />
                 <div className="flex-1">
                   <div className="cap text-[15px] font-semibold leading-tight">{p.name}</div>
-                  <div className="text-[10px] text-text-dim">{p.position}</div>
+                  <div className="text-[10px] text-text-dim flex items-center gap-2">
+                    {p.position}
+                    {fixturesCount > 0 && p.upcomingFixtures && (
+                      <FixtureChips fixtures={p.upcomingFixtures.slice(0, fixturesCount)} size="sm" />
+                    )}
+                  </div>
                 </div>
                 <span className="cap w-14 text-right text-[15px] font-semibold text-accent">
                   {p.price.toFixed(1)}

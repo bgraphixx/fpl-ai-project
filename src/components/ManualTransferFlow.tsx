@@ -321,9 +321,13 @@ export function ManualTransferFlow({
                         <div className="text-[11px] text-text-dim">
                           {slot.player.position} · £{slot.player.price.toFixed(1)}
                         </div>
-                        <div className="mt-1">
-                          <FixtureChips fixtures={playerById.get(slot.player.id)?.upcomingFixtures} />
-                        </div>
+                        {fixturesCount > 0 && (
+                          <div className="mt-1">
+                            <FixtureChips
+                              fixtures={playerById.get(slot.player.id)?.upcomingFixtures?.slice(0, fixturesCount)}
+                            />
+                          </div>
+                        )}
                       </div>
                       <div className="flex shrink-0 flex-col items-end gap-1.5">
                         <button

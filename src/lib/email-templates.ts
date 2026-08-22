@@ -243,6 +243,62 @@ export function buildRecommendationEmail(
   };
 }
 
+// ─── Template: Deadline Reminder ────────────────────────────────────────────
+
+export function deadlineReminderEmail(
+  email: string,
+  gameweek: number,
+  stage: "24h" | "2h",
+  deadlineISO: string,
+): { subject: string; html: string } {
+  const deadline = new Date(deadlineISO);
+  const timeLabel = deadline.toLocaleString(undefined, {
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  const leadLabel = stage === "24h" ? "about 24 hours" : "about 2 hours";
+  const urgency = stage === "2h" ? "Last call" : "Heads up";
+
+  const content = `
+    <h1 style="margin:0 0 8px;font-size:24px;font-weight:700;color:#f3f7f4;letter-spacing:0.02em;">${urgency} — GW${gameweek} deadline in ${leadLabel}</h1>
+    <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#9fb0a6;">
+      The Gameweek ${gameweek} deadline is <strong style="color:#f3f7f4;">${timeLabel}</strong>. Make sure your team, captain, and any transfers are locked in before then.
+    </p>
+    ${ctaButton("Check my team →", `${APP_URL}/squad`)}
+    <p style="margin:20px 0 0;font-size:13px;line-height:1.6;color:#6b7c72;">
+      Don't want these reminders? Turn them off anytime in <a href="${APP_URL}/settings" style="color:#6b7c72;text-decoration:underline;">Settings</a>.
+    </p>
+  `;
+  return {
+    subject: `${urgency}: GW${gameweek} deadline in ${leadLabel}`,
+    html: layout(`GW${gameweek} deadline is ${timeLabel} — ${leadLabel} away.`, content),
+  };
+}
+
+// ─── Template: Password Reset ─────────────────────────────────────────────
+
+export function passwordResetEmail(
+  email: string,
+  resetUrl: string,
+): { subject: string; html: string } {
+  const content = `
+    <h1 style="margin:0 0 8px;font-size:24px;font-weight:700;color:#f3f7f4;letter-spacing:0.02em;">Reset your password</h1>
+    <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#9fb0a6;">
+      We received a request to reset the password for your Smart Gaffer account associated with ${escapeHtml(email)}.
+      Click the button below to choose a new password. This link will expire in 1 hour.
+    </p>
+    ${ctaButton("Reset Password →", resetUrl)}
+    <p style="margin:20px 0 0;font-size:13px;line-height:1.6;color:#6b7c72;">
+      If you didn't request this, you can safely ignore this email.
+    </p>
+  `;
+  return {
+    subject: "Reset your Smart Gaffer password",
+    html: layout("Reset your password", content),
+  };
+}
+
 // ─── Utility ────────────────────────────────────────────────────────────────
 
 function escapeHtml(str: string): string {

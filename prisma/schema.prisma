@@ -26,8 +26,41 @@ model User {
   fplTeamName  String?
   createdAt    DateTime @default(now())
 
-  squadSnapshots  SquadSnapshot[]
-  recommendations Recommendation[]
+  // Deadline reminder preferences + de-dupe state. `lastReminderGw` +
+  // `lastReminderStage` together record the most recent (gameweek, stage)
+  // pair already reminded for, so the 24h/2h dispatch check never re-sends
+  // for the same stage twice even if the cron tick overlaps.
+  emailRemindersEnabled Boolean @default(true)
+  pushRemindersEnabled  Boolean @default(true)
+  lastReminderGw        Int?
+  lastReminderStage     String?
+
+  squadSnapshots    SquadSnapshot[]
+  recommendations   Recommendation[]
+  pushSubscriptions PushSubscription[]
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
 }
 
 model SquadSnapshot {

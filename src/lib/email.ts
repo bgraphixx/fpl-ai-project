@@ -61,3 +61,14 @@ export async function sendEmail(opts: SendEmailOptions): Promise<SendEmailResult
     return { ok: false, error: msg };
   }
 }
+
+export async function sendPasswordResetEmail(email: string, resetUrl: string) {
+  const { passwordResetEmail } = await import("./email-templates");
+  const { subject, html } = passwordResetEmail(email, resetUrl);
+  
+  return sendEmail({
+    to: { address: email },
+    subject,
+    html,
+  });
+}

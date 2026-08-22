@@ -10,9 +10,10 @@ function timeParts(deadlineISO: string) {
   return { days, hours, minutes };
 }
 
-// GW deadline countdown hero (design ref B2). Recomputes client-side every
-// minute; the initial render uses the server-computed value to avoid a
-// hydration flash of "0d 0h".
+// GW deadline countdown — a slim single-line bar rather than a tall hero
+// card, so it doesn't push the pitch below the first viewport on mobile.
+// Recomputes client-side every minute; the initial render uses the
+// server-computed value to avoid a hydration flash of "0d 0h".
 export function Countdown({
   deadlineISO,
   gameweek,
@@ -31,29 +32,21 @@ export function Countdown({
     return () => clearInterval(id);
   }, [deadlineISO]);
 
-  const deadline = new Date(deadlineISO);
-  const dayLabel = deadline.toLocaleDateString(undefined, { weekday: "short" });
-  const timeLabel = deadline.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
-
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-success-deep bg-gradient-to-br from-[#14351f] to-[#0c1c13] p-5">
-      <div className="cap text-xs font-bold uppercase tracking-widest text-accent">
-        GW{gameweek} deadline
-      </div>
-      <div className="cap mt-1.5 flex items-baseline gap-2">
-        <span className="text-4xl font-bold leading-none sm:text-5xl">
-          {parts.days}
-          <span className="text-xl text-text-muted sm:text-2xl">d</span> {parts.hours}
-          <span className="text-xl text-text-muted sm:text-2xl">h</span> {parts.minutes}
-          <span className="text-xl text-text-muted sm:text-2xl">m</span>
-        </span>
-      </div>
-      <div className="mt-2 text-sm text-[#cdd8d1]">
-        {dayLabel} {timeLabel} · {fixtureCount} fixtures ·{" "}
-        <span className="text-warning">
-          {freeTransfers} free transfer{freeTransfers === 1 ? "" : "s"}
-        </span>
-      </div>
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border border-success-deep bg-gradient-to-r from-[#14351f] to-[#0c1c13] px-3.5 py-2 text-[13px]">
+      <span className="cap font-bold uppercase tracking-wide text-accent">GW{gameweek}</span>
+      <span className="cap font-bold text-text">
+        {parts.days}
+        <span className="text-text-muted">d</span> {parts.hours}
+        <span className="text-text-muted">h</span> {parts.minutes}
+        <span className="text-text-muted">m</span>
+      </span>
+      <span className="text-text-dim">·</span>
+      <span className="text-[#cdd8d1]">{fixtureCount} fixtures</span>
+      <span className="text-text-dim">·</span>
+      <span className="text-warning">
+        {freeTransfers} free transfer{freeTransfers === 1 ? "" : "s"}
+      </span>
     </div>
   );
 }

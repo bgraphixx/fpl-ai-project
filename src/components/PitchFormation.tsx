@@ -9,12 +9,14 @@ const ROW_ORDER = ["GK", "DEF", "MID", "FWD"] as const;
 export function PitchFormation({
   players,
   onSelectPlayer,
+  highlightedId = null,
   showPrice = true,
   showPoints = false,
   fixturesCount = 0,
 }: {
   players: DisplayPlayer[];
   onSelectPlayer?: (player: DisplayPlayer) => void;
+  highlightedId?: number | null;
   showPrice?: boolean;
   showPoints?: boolean;
   fixturesCount?: 0 | 1 | 3;
@@ -38,6 +40,7 @@ export function PitchFormation({
                 key={p.id}
                 player={p}
                 onClick={() => onSelectPlayer?.(p)}
+                isHighlighted={highlightedId === p.id}
                 showPrice={showPrice}
                 showPoints={showPoints}
                 fixturesCount={fixturesCount}

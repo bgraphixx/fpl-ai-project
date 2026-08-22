@@ -177,7 +177,11 @@ export function BuildFlow({ gameweek }: { gameweek: number }) {
               fixturesCount={displayMode === "price" ? 0 : displayMode === "next1" ? 1 : 3}
             />
           ) : (
-            <SquadTable players={squadPlayers} onSelectPlayer={openDetail} />
+            <SquadTable 
+              players={squadPlayers} 
+              onSelectPlayer={openDetail}
+              fixturesCount={displayMode === "price" ? 0 : displayMode === "next1" ? 1 : 3}
+            />
           )}
 
           <div className="flex gap-2.5">

@@ -55,7 +55,15 @@ export async function POST(request: Request) {
   const squadById = new Map<number, SquadPlayer>(squadPlayers.map((p) => [p.id, p]));
 
   // 1. Math Solver Engine (Determines the optimal squad instantly)
-  const solverResult = solveStartingXI(signals);
+  let solverResult;
+  try {
+    solverResult = solveStartingXI(signals);
+  } catch (err) {
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Couldn't compute a starting XI for this squad" },
+      { status: 422 },
+    );
+  }
 
   // 2. Analyst LLM (Explains the mathematical choices)
   const messages = buildXIPrompt(signals, solverResult);

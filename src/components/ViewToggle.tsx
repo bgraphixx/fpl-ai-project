@@ -29,7 +29,7 @@ export function ViewToggle({
           <path d="M12 5v14" />
           <circle cx="12" cy="12" r="3" />
         </svg>
-        Pitch
+        <span className="hidden sm:inline">Pitch</span>
       </button>
       <button
         onClick={() => onChange("table")}
@@ -55,7 +55,7 @@ export function ViewToggle({
           <path d="M9 3v18" />
           <path d="M15 3v18" />
         </svg>
-        Table
+        <span className="hidden sm:inline">Table</span>
       </button>
     </div>
   );

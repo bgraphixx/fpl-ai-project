@@ -14,9 +14,13 @@ export function LoginForm() {
       <Field label="Email">
         <Input type="email" name="email" placeholder="sam@example.com" required autoFocus />
       </Field>
-      <Field label="Password">
-        <Input type="password" name="password" placeholder="••••••••" required minLength={8} />
-      </Field>
+      <div className="mb-2 flex items-center justify-between">
+        <label className="text-sm font-semibold">Password</label>
+        <Link href="/forgot-password" className="text-xs font-semibold text-accent">
+          Forgot password?
+        </Link>
+      </div>
+      <Input type="password" name="password" placeholder="••••••••" required minLength={8} className="mb-4" />
       {state.error && <p className="mb-4 text-sm text-danger">{state.error}</p>}
       <Button type="submit" className="w-full" disabled={pending}>
         {pending ? "Signing in…" : "Sign in"}

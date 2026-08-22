@@ -167,7 +167,10 @@ export function XIFlow({ squad }: { squad: CurrentSquad }) {
               </div>
             </>
           ) : (
-            <SquadTable players={allXIPlayers} onSelectPlayer={openDetail} />
+            <SquadTable
+              players={allXIPlayers}
+              onSelectPlayer={openDetail}
+            />
           )}
 
           <button onClick={generate} className="cap text-sm font-semibold text-text-muted" type="button">

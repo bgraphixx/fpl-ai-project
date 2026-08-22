@@ -1,4 +1,5 @@
 import { refreshSharedFplCache } from "@/lib/fpl";
+import { dispatchDeadlineReminders } from "@/lib/reminders";
 
 const REFRESH_INTERVAL_MS = 30 * 60 * 1000;
 
@@ -15,6 +16,14 @@ async function runRefresh() {
     console.log(`FPL cache refresh: ok in ${Date.now() - startedAt}ms`);
   } catch (err) {
     console.error("FPL cache refresh: failed", err instanceof Error ? err.message : err);
+  }
+
+  // Piggybacks on this same tick — deliberately after the cache refresh
+  // above so it reads freshly-warmed bootstrap data, not stale.
+  try {
+    await dispatchDeadlineReminders();
+  } catch (err) {
+    console.error("Deadline reminders: failed", err instanceof Error ? err.message : err);
   }
 }
 

@@ -30,6 +30,9 @@ export type PlayerDetail = {
   fetchHistory?: boolean;
   actionLabel?: string;
   onAction?: () => void;
+  onSubstitute?: () => void;
+  onMakeCaptain?: () => void;
+  onMakeViceCaptain?: () => void;
   // Manual Transfers only: a deterministic xPts-ranked "who should replace
   // this player" shortlist, each row tappable via onPickSuggestion. Paired
   // with swapContext, a "Consult AI" button lazy-calls /api/recommend/swap
@@ -246,6 +249,42 @@ export function PlayerDetailPanel({
           >
             {detail.actionLabel}
           </button>
+        )}
+
+        {(detail.onSubstitute || detail.onMakeCaptain || detail.onMakeViceCaptain) && (
+          <div className="mt-4 flex flex-col gap-2">
+            {detail.onSubstitute && (
+              <button
+                onClick={detail.onSubstitute}
+                type="button"
+                className="cap w-full rounded-xl bg-surface-2 border border-border py-3 text-[15px] font-bold hover:bg-surface"
+              >
+                Substitute
+              </button>
+            )}
+            {(detail.onMakeCaptain || detail.onMakeViceCaptain) && (
+              <div className="flex gap-2">
+                {detail.onMakeCaptain && (
+                  <button
+                    onClick={detail.onMakeCaptain}
+                    type="button"
+                    className="cap flex-1 rounded-xl bg-surface-2 border border-border py-2.5 text-[14px] font-bold hover:bg-surface text-accent"
+                  >
+                    Make Captain
+                  </button>
+                )}
+                {detail.onMakeViceCaptain && (
+                  <button
+                    onClick={detail.onMakeViceCaptain}
+                    type="button"
+                    className="cap flex-1 rounded-xl bg-surface-2 border border-border py-2.5 text-[14px] font-bold hover:bg-surface text-accent"
+                  >
+                    Make Vice Captain
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
         )}
       </div>
     </>

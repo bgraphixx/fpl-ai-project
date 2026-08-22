@@ -20,18 +20,25 @@ export function PlayerChip({
   onClick,
   showPrice = true,
   showPoints = false,
+  isHighlighted = false,
   fixturesCount = 0,
 }: {
   player: DisplayPlayer;
   onClick?: () => void;
   showPrice?: boolean;
   showPoints?: boolean;
+  isHighlighted?: boolean;
   fixturesCount?: 0 | 1 | 3;
 }) {
+  const containerClasses = [
+    "flex min-w-0 flex-1 flex-col items-center gap-1",
+    isHighlighted ? "bg-accent/20 ring-2 ring-accent rounded-md shadow-[0_0_15px_rgba(205,255,0,0.5)]" : "",
+  ].join(" ");
+
   return (
     <button
       onClick={onClick}
-      className="flex min-w-0 flex-1 flex-col items-center gap-1"
+      className={containerClasses}
       type="button"
     >
       <div className="relative">

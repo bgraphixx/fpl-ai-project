@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { logoutAction } from "@/lib/auth-actions";
+import { NotificationSettings } from "@/components/NotificationSettings";
 
 export default async function SettingsPage() {
   const session = await auth();
@@ -47,6 +48,11 @@ export default async function SettingsPage() {
         </div>
       </div>
 
+      <NotificationSettings
+        initialEmailEnabled={user?.emailRemindersEnabled ?? true}
+        initialPushEnabled={user?.pushRemindersEnabled ?? true}
+      />
+
       <div>
         <div className="mb-2 px-1 text-[11px] font-bold uppercase tracking-wider text-text-dim">
           Account
@@ -56,6 +62,10 @@ export default async function SettingsPage() {
             <div className="cap text-[15px] font-semibold">Email</div>
             <div className="text-[13px] text-text-dim">{user?.email}</div>
           </div>
+          <Link href="/settings/password" className="flex items-center justify-between border-b border-border-soft px-4 py-3.5">
+            <div className="cap text-[15px] font-semibold">Change Password</div>
+            <span className="text-text-dim">›</span>
+          </Link>
           <form action={logoutAction}>
             <button
               type="submit"
@@ -69,7 +79,7 @@ export default async function SettingsPage() {
       </div>
 
       <p className="text-center text-xs text-text-dim">
-        AI Picker v1.0 · shared key · not affiliated with the official game
+        Smart Gaffer v1.0 · Built by Ibeh Ebubechukwu · not affiliated with the official game
       </p>
     </div>
   );

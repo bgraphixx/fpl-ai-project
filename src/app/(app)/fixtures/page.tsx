@@ -1,5 +1,5 @@
 import { getBootstrapStatic, getFixtures } from "@/lib/fpl";
-import { targetGameweek } from "@/lib/gameweek";
+import { pickableGameweek } from "@/lib/gameweek";
 import { FixturesView } from "@/components/FixturesView";
 import { StateScreen } from "@/components/StateScreen";
 
@@ -14,7 +14,7 @@ type LoadResult =
 async function loadFixtures(): Promise<LoadResult> {
   try {
     const bootstrap = (await getBootstrapStatic()) as BootstrapStatic;
-    const gw = targetGameweek(bootstrap.events) ?? bootstrap.events[0];
+    const gw = pickableGameweek(bootstrap.events) ?? bootstrap.events.find(e => e.is_next) ?? bootstrap.events[0];
     if (!gw) return { kind: "unreachable" };
 
     const fixtures = await getFixtures(gw.id);

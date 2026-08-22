@@ -21,7 +21,7 @@ export function DisplayModeToggle({
         <button
           key={opt.key}
           onClick={() => onChange(opt.key)}
-          className={`cap flex-1 rounded-lg py-1.5 text-[13px] font-bold ${
+          className={`cap flex-1 whitespace-nowrap rounded-lg px-2 py-1.5 text-[13px] font-bold ${
             mode === opt.key ? "bg-accent text-accent-ink" : "text-text-muted"
           }`}
           type="button"

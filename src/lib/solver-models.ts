@@ -33,7 +33,7 @@ export function solveStartingXI(squad: PlayerSignal[]): SolverXIResult {
       viceCaptains: { equal: 1 },
     },
     variables: {},
-    ints: {},
+    binaries: {},
   };
 
   for (const player of squad) {
@@ -41,40 +41,50 @@ export function solveStartingXI(squad: PlayerSignal[]): SolverXIResult {
     const capVar = `cap_${player.id}`;
     const viceVar = `vice_${player.id}`;
 
-    // Starter variable
+    // Starter variable. `is_starter_${id}` is constrained to `max: 0` below,
+    // and cap/vice each contribute +1 to it while start contributes -1, so
+    // the constraint reads cap + vice - start <= 0, i.e. cap + vice <= start
+    // — a player can only be captain/vice if they're actually starting.
+    // All three variables are `binaries` (0/1), not just `ints` (any
+    // non-negative integer) — without that, the solver is free to e.g. set
+    // start_x = 5 if it happens to help the objective, which silently
+    // breaks every constraint that counts starters/positions/etc.
     model.variables[startVar] = {
       expectedPoints: player.expectedPoints,
       starters: 1,
       [player.position]: 1,
-      // Captains and vice captains must be starters
-      [`is_starter_${player.id}`]: 1,
+      [`is_starter_${player.id}`]: -1,
     };
-    model.ints![startVar] = 1;
+    model.binaries![startVar] = 1;
 
     // Captain variable (gets double points)
     model.variables[capVar] = {
       expectedPoints: player.expectedPoints, // 1x extra point
       captains: 1,
-      [`is_starter_${player.id}`]: -1, // Constraint: cap <= start (so cap - start <= 0)
+      [`is_starter_${player.id}`]: 1,
       [`is_cap_or_vice_${player.id}`]: 1,
     };
-    model.ints![capVar] = 1;
-    model.constraints[`is_starter_${player.id}`] = { max: 0 }; // cap + vice <= start -> (cap+vice) - start <= 0
+    model.binaries![capVar] = 1;
+    model.constraints[`is_starter_${player.id}`] = { max: 0 };
 
-    // Vice Captain variable (no extra points unless cap doesn't play, but we don't model that here. 
+    // Vice Captain variable (no extra points unless cap doesn't play, but we don't model that here.
     // We just pick the second highest expected points as vice).
     // To encourage picking the second best, we give it a tiny fractional point bonus (0.01)
     model.variables[viceVar] = {
-      expectedPoints: 0.01 * player.expectedPoints, 
+      expectedPoints: 0.01 * player.expectedPoints,
       viceCaptains: 1,
-      [`is_starter_${player.id}`]: -1,
+      [`is_starter_${player.id}`]: 1,
       [`is_cap_or_vice_${player.id}`]: 1,
     };
-    model.ints![viceVar] = 1;
+    model.binaries![viceVar] = 1;
     model.constraints[`is_cap_or_vice_${player.id}`] = { max: 1 }; // Can't be both cap and vice
   }
 
   const results = solver.Solve(model) as SolveResult;
+  if (!results.feasible) {
+    throw new Error("solveStartingXI: no feasible starting XI found for this squad");
+  }
+
   const startingXI: number[] = [];
   let captainId = squad[0].id;
   let viceCaptainId = squad[1].id;
@@ -122,7 +132,9 @@ export function solveTransfers(
       budget: { max: totalBudget },
     },
     variables: {},
-    ints: {},
+    // Binary, not just integer — see the note in solveStartingXI. Without
+    // this, the solver could "select" the same player multiple times.
+    binaries: {},
   };
 
   // If hits are not allowed, cap the incoming transfers to freeTransfers
@@ -148,7 +160,7 @@ export function solveTransfers(
       [`club_${player.club}`]: 1,
       transfersIn: isCurrent ? 0 : 1,
     };
-    model.ints![varName] = 1;
+    model.binaries![varName] = 1;
   }
 
   // Model the -4 hit penalty variable
