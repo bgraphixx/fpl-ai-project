@@ -10,6 +10,7 @@ const BOOTSTRAP_TTL_MS = 40 * 60 * 1000;
 const FIXTURES_TTL_MS = 40 * 60 * 1000;
 const ELEMENT_SUMMARY_TTL_MS = 40 * 60 * 1000;
 const EVENT_LIVE_TTL_MS = 40 * 60 * 1000;
+const LEAGUE_STANDINGS_TTL_MS = 15 * 60 * 1000;
 
 async function fplFetch<T>(path: string): Promise<T> {
   const res = await fetch(`${FPL_BASE}${path}`, {
@@ -84,6 +85,20 @@ export function getEntryTransfers(teamId: number) {
 // every user, so it's cached and kept warm the same way as bootstrap/fixtures.
 export function getEventLive(gameweek: number) {
   return cached(`event-live:${gameweek}`, EVENT_LIVE_TTL_MS, () => fplFetch(`/event/${gameweek}/live/`));
+}
+
+// Fetch classic league standings, cached for 15 minutes.
+export function getLeagueClassicStandings(leagueId: number, page: number = 1) {
+  return cached(`league-classic:${leagueId}:page:${page}`, LEAGUE_STANDINGS_TTL_MS, () =>
+    fplFetch(`/leagues-classic/${leagueId}/standings/?page_new_entries=1&page_standings=${page}`)
+  );
+}
+
+// Fetch H2H league standings, cached for 15 minutes.
+export function getLeagueH2HStandings(leagueId: number, page: number = 1) {
+  return cached(`league-h2h:${leagueId}:page:${page}`, LEAGUE_STANDINGS_TTL_MS, () =>
+    fplFetch(`/leagues-h2h/${leagueId}/standings/?page_new_entries=1&page_standings=${page}`)
+  );
 }
 
 type BootstrapEvent = { id: number; deadline_time: string; finished: boolean; is_current: boolean; is_next: boolean };

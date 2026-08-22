@@ -7,7 +7,7 @@ import { getEntry } from "@/lib/fpl";
 import { sendEmail } from "@/lib/email";
 import { teamLinkedEmail } from "@/lib/email-templates";
 
-type FplEntry = { name?: string; player_first_name?: string; player_last_name?: string };
+import { FplEntry } from "@/types/fpl";
 
 export async function linkTeamAction(
   _prevState: { error: string | null },

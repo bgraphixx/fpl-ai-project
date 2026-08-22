@@ -52,8 +52,14 @@ export function PlayerChip({
           {player.name}
         </div>
         {player.expectedPoints !== undefined && (
-          <div className="text-[9px] font-medium text-accent-deep bg-accent/10 rounded-sm mx-auto w-max px-1 mb-0.5">
-            {player.expectedPoints.toFixed(1)} xPts
+          <div className="text-[9px] font-medium text-accent bg-accent/10 rounded-sm mx-auto w-max px-1 mb-0.5">
+            {(fixturesCount > 1
+              ? (player.upcomingFixtures ?? [])
+                  .slice(0, fixturesCount)
+                  .reduce((sum, f) => sum + (f.expectedPoints ?? 0), 0)
+              : player.expectedPoints
+            ).toFixed(1)}{" "}
+            xPts
           </div>
         )}
         {showPoints ? (

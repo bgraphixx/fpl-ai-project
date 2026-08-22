@@ -6,7 +6,7 @@ import { getEntry } from "@/lib/fpl";
 
 const schema = z.object({ fplTeamId: z.number().int().positive() });
 
-type FplEntry = { name?: string };
+import { FplEntry } from "@/types/fpl";
 
 export async function POST(request: Request) {
   const session = await auth();

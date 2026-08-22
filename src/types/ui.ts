@@ -2,8 +2,13 @@ import type { Position } from "@/types/fpl";
 
 export type UpcomingFixture = {
   opponent: string;
+  opponentTeamId: number;
   difficulty: number;
   isHome: boolean;
+  // Only populated by the player-signal builders (signals.ts/squad.ts) — the
+  // plain team-fixtures list (Fixtures page) has no player context to
+  // compute this from, so it's optional rather than always present.
+  expectedPoints?: number;
 };
 
 // Normalized shape stored in SquadSnapshot.players — just enough to

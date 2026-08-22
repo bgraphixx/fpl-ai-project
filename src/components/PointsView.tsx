@@ -84,7 +84,7 @@ function PlayerPointsRow({ player, onClick }: { player: DisplayPlayer; onClick: 
           {multiplier > 1 && <span className="ml-1 text-xs text-text-dim">({raw} × {multiplier})</span>}
         </div>
         {player.expectedPoints !== undefined && (
-          <div className="text-[11px] font-medium text-accent-deep mt-0.5">
+          <div className="text-[11px] font-medium text-accent mt-0.5">
             {player.expectedPoints.toFixed(1)} xPts
           </div>
         )}

@@ -9,7 +9,7 @@ const NAV_ITEMS = [
   { href: "/squad", label: "Pick Team", icon: "👕" },
   { href: "/transfers", label: "Transfers", icon: "⇄" },
   { href: "/fixtures", label: "Fixtures", icon: "🗓️" },
-  { href: "/settings", label: "Settings", icon: "⚙" },
+  { href: "/leagues", label: "Leagues", icon: "🏆" },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -23,7 +23,7 @@ export function Logo() {
       <div className="cap flex h-9 w-9 items-center justify-center rounded-[9px] bg-accent text-lg font-bold text-accent-ink">
         XI
       </div>
-      <div className="cap text-xl font-bold">AI Picker</div>
+      <div className="cap text-xl font-bold">FPL Genie</div>
     </div>
   );
 }

@@ -73,16 +73,20 @@ type ElementForExpectedPoints = {
 
 // Shared by buildPlayerSignals (below) and squad.ts's joinDisplaySquad /
 // getAllPlayers — the one place that turns a bootstrap element + its
-// upcoming fixture/history/team-strength context into an xPts number, so
-// this math only exists once.
-export function computeExpectedPointsForElement(
+// upcoming fixtures/history/team-strength context into a per-fixture xPts
+// number, so this math only exists once. Computes one projection per
+// upcoming fixture (not just the next one) so "Next 3"-style UI can sum
+// them, using the *same* underlying per-90 rates for each — only the
+// opponent-strength multiplier varies fixture to fixture. Resolves each
+// fixture's opponent strength via `opponentTeamId` (an O(1) map read)
+// rather than a per-fixture reverse lookup by short name.
+export function attachExpectedPoints(
   el: ElementForExpectedPoints,
   position: Position,
   upcomingFixtures: UpcomingFixture[],
   history: PlayerHistory | undefined,
-  teamStrength: TeamStrength | undefined,
-  opponentStrength: TeamStrength | undefined,
-): number {
+  teamStrengthMap: Map<number, TeamStrength>,
+): UpcomingFixture[] {
   // Bootstrap's expected_goals/expected_assists/etc. are season totals, not
   // per-90 — divide by appearances (minutes / 90) to get a per-game rate
   // for calculateExpectedPoints.
@@ -96,31 +100,38 @@ export function computeExpectedPointsForElement(
 
   const price = el.now_cost / 10;
   const pointsPerGame = Number(el.points_per_game) || 0;
-  const isHome = upcomingFixtures[0]?.isHome ?? true;
+  const teamStrength = teamStrengthMap.get(el.team);
 
-  return calculateExpectedPoints({
-    position,
-    price,
-    pointsPerGame,
-    chanceOfPlaying: el.chance_of_playing_this_round,
-    expectedGoals: xGPerGame,
-    expectedAssists: xAPerGame,
-    expectedGoalsConceded: xGCPerGame,
-    bps: bpsPerGame,
-    minutesPerGame: avgMinutes,
+  return upcomingFixtures.map((fixture) => {
+    const opponentStrength = teamStrengthMap.get(fixture.opponentTeamId);
+    const isHome = fixture.isHome;
 
-    historicalXG: history ? Number(history.pastSeasonXG) : undefined,
-    historicalXA: history ? Number(history.pastSeasonXA) : undefined,
-    historicalXGC: history ? Number(history.pastSeasonXGC) : undefined,
-    historicalSaves: history?.pastSeasonSaves,
-    historicalBPS: history?.pastSeasonBPS,
-    historicalStarts: history?.pastSeasonStarts,
-    historicalMinutes: history?.pastSeasonMinutes,
+    const expectedPoints = calculateExpectedPoints({
+      position,
+      price,
+      pointsPerGame,
+      chanceOfPlaying: el.chance_of_playing_this_round,
+      expectedGoals: xGPerGame,
+      expectedAssists: xAPerGame,
+      expectedGoalsConceded: xGCPerGame,
+      bps: bpsPerGame,
+      minutesPerGame: avgMinutes,
 
-    teamAttackStrength: teamStrength ? (isHome ? teamStrength.strengthAttackHome : teamStrength.strengthAttackAway) : undefined,
-    teamDefenseStrength: teamStrength ? (isHome ? teamStrength.strengthDefenseHome : teamStrength.strengthDefenseAway) : undefined,
-    opponentAttackStrength: opponentStrength ? (!isHome ? opponentStrength.strengthAttackHome : opponentStrength.strengthAttackAway) : undefined,
-    opponentDefenseStrength: opponentStrength ? (!isHome ? opponentStrength.strengthDefenseHome : opponentStrength.strengthDefenseAway) : undefined,
+      historicalXG: history ? Number(history.pastSeasonXG) : undefined,
+      historicalXA: history ? Number(history.pastSeasonXA) : undefined,
+      historicalXGC: history ? Number(history.pastSeasonXGC) : undefined,
+      historicalSaves: history?.pastSeasonSaves,
+      historicalBPS: history?.pastSeasonBPS,
+      historicalStarts: history?.pastSeasonStarts,
+      historicalMinutes: history?.pastSeasonMinutes,
+
+      teamAttackStrength: teamStrength ? (isHome ? teamStrength.strengthAttackHome : teamStrength.strengthAttackAway) : undefined,
+      teamDefenseStrength: teamStrength ? (isHome ? teamStrength.strengthDefenseHome : teamStrength.strengthDefenseAway) : undefined,
+      opponentAttackStrength: opponentStrength ? (!isHome ? opponentStrength.strengthAttackHome : opponentStrength.strengthAttackAway) : undefined,
+      opponentDefenseStrength: opponentStrength ? (!isHome ? opponentStrength.strengthDefenseHome : opponentStrength.strengthDefenseAway) : undefined,
+    });
+
+    return { ...fixture, expectedPoints };
   });
 }
 
@@ -139,23 +150,12 @@ export function buildPlayerSignals(
     const el = elementById.get(id);
     if (!el) throw new Error(`Unknown player id ${id}`);
 
-    const upcomingFixtures = computeUpcomingFixtures(fixtures, el.team, teamById, lookaheadGameweeks);
+    const rawUpcomingFixtures = computeUpcomingFixtures(fixtures, el.team, teamById, lookaheadGameweeks);
     const position = POSITION_MAP[el.element_type] ?? "UNK";
 
     const history = historyMap.get(el.id);
-    const teamStrength = teamStrengthMap.get(el.team);
-    // For opponent defense, we need to know who the next opponent is
-    const opponentTeam = bootstrap.teams.find((t) => t.short_name === upcomingFixtures[0]?.opponent);
-    const opponentStrength = opponentTeam ? teamStrengthMap.get(opponentTeam.id) : undefined;
-
-    const expectedPoints = computeExpectedPointsForElement(
-      el,
-      position,
-      upcomingFixtures,
-      history,
-      teamStrength,
-      opponentStrength,
-    );
+    const upcomingFixtures = attachExpectedPoints(el, position, rawUpcomingFixtures, history, teamStrengthMap);
+    const expectedPoints = upcomingFixtures[0]?.expectedPoints ?? 0;
 
     return {
       id: el.id,

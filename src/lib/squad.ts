@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getBootstrapStatic, getEntryPicks, getEventLive, getFixtures } from "@/lib/fpl";
 import { pickableGameweek, targetGameweek } from "@/lib/gameweek";
 import { computeUpcomingFixtures, type Fixture } from "@/lib/fixtures-lookahead";
-import { computeExpectedPointsForElement } from "@/lib/signals";
+import { attachExpectedPoints } from "@/lib/signals";
 import type { DisplayPlayer, StoredPick } from "@/types/ui";
 import type { Position } from "@/types/fpl";
 import type { PlayerHistory, TeamStrength } from "@prisma/client";
@@ -130,21 +130,10 @@ function joinDisplaySquad(
     const liveEl = liveById.get(pick.id);
     const position = POSITION_MAP[el.element_type] ?? "MID";
 
-    const upcomingFixtures = fixtures ? computeUpcomingFixtures(fixtures, el.team, teamById) : undefined;
-
+    const rawUpcomingFixtures = fixtures ? computeUpcomingFixtures(fixtures, el.team, teamById) : [];
     const history = historyMap?.get(el.id);
-    const teamStrength = teamStrengthMap?.get(el.team);
-    const opponentTeam = bootstrap.teams.find((t) => t.short_name === upcomingFixtures?.[0]?.opponent);
-    const opponentStrength = opponentTeam ? teamStrengthMap?.get(opponentTeam.id) : undefined;
-
-    const expectedPoints = computeExpectedPointsForElement(
-      el,
-      position,
-      upcomingFixtures ?? [],
-      history,
-      teamStrength,
-      opponentStrength,
-    );
+    const enrichedFixtures = attachExpectedPoints(el, position, rawUpcomingFixtures, history, teamStrengthMap ?? new Map());
+    const expectedPoints = enrichedFixtures[0]?.expectedPoints ?? 0;
 
     return {
       id: el.id,
@@ -162,7 +151,7 @@ function joinDisplaySquad(
       gwPoints: liveEl?.stats.total_points,
       multiplier: pick.isCaptain ? 2 : 1,
       gwStatsBreakdown: liveEl?.explain[0]?.stats,
-      upcomingFixtures,
+      upcomingFixtures: fixtures ? enrichedFixtures : undefined,
     };
   };
 
@@ -295,6 +284,63 @@ export async function getSquad(userId: string): Promise<CurrentSquad> {
   return refreshSquadFromFpl(userId);
 }
 
+// Fetches a squad directly from FPL for a public view (e.g. rival squads).
+// Doesn't store a snapshot in the database.
+export async function getPublicSquad(fplTeamId: number): Promise<CurrentSquad> {
+  const bootstrap = (await getBootstrapStatic()) as Bootstrap;
+  const pickableGw = pickableGameweek(bootstrap.events);
+  if (!pickableGw) throw new NoActiveGameweekError();
+  const targetGw = targetGameweek(bootstrap.events) ?? pickableGw;
+
+  const [picks, live, fixtures] = await Promise.all([
+    getEntryPicks(fplTeamId, pickableGw.id).catch(() => {
+      // FPL might return 404 or something if team doesn't exist/didn't make transfers, etc.
+      throw new Error(`Couldn't load picks for team ${fplTeamId}`);
+    }) as Promise<FplPicksResponse>,
+    getEventLive(pickableGw.id).catch(() => null) as Promise<FplLiveResponse | null>,
+    getFixtures() as Promise<Fixture[]>,
+  ]);
+
+  const storedPicks: StoredPick[] = picks.picks.map((p) => ({
+    id: p.element,
+    isCaptain: p.is_captain,
+    isViceCaptain: p.is_vice_captain,
+    isBench: p.multiplier === 0,
+  }));
+
+  const [historyRecords, teamStrengths] = await Promise.all([
+    prisma.playerHistory.findMany({ where: { id: { in: storedPicks.map((p) => p.id) } } }),
+    prisma.teamStrength.findMany(),
+  ]);
+  const historyMap = new Map(historyRecords.map((h) => [h.id, h]));
+  const teamStrengthMap = new Map(teamStrengths.map((t) => [t.id, t]));
+
+  const { starting, bench } = joinDisplaySquad(
+    storedPicks,
+    bootstrap,
+    live,
+    fixtures,
+    historyMap,
+    teamStrengthMap
+  );
+
+  return {
+    gameweek: targetGw.id,
+    bank: picks.entry_history.bank / 10,
+    teamValue: picks.entry_history.value / 10,
+    starting,
+    bench,
+    source: "auto",
+    lastSyncedAt: new Date(),
+    pointsGameweek: pickableGw.id,
+    points: picks.entry_history.points,
+    totalPoints: picks.entry_history.total_points,
+    rank: picks.entry_history.rank,
+    pointsOnBench: picks.entry_history.points_on_bench,
+    transferCost: picks.entry_history.event_transfers_cost,
+  };
+}
+
 // Persists a manually-edited squad (from the squad editor or a manual
 // transfer) as the new latest snapshot — it becomes what every page shows
 // until the user hits Refresh. Has no real FPL score, so points/rank etc.
@@ -365,21 +411,11 @@ export async function getAllPlayers(): Promise<DisplayPlayer[]> {
   return bootstrap.elements.map((el) => {
     const chance = el.chance_of_playing_this_round;
     const position = POSITION_MAP[el.element_type] ?? "MID";
-    const upcomingFixtures = computeUpcomingFixtures(fixtures, el.team, teamById);
+    const rawUpcomingFixtures = computeUpcomingFixtures(fixtures, el.team, teamById);
 
     const history = historyMap.get(el.id);
-    const teamStrength = teamStrengthMap.get(el.team);
-    const opponentTeam = bootstrap.teams.find((t) => t.short_name === upcomingFixtures[0]?.opponent);
-    const opponentStrength = opponentTeam ? teamStrengthMap.get(opponentTeam.id) : undefined;
-
-    const expectedPoints = computeExpectedPointsForElement(
-      el,
-      position,
-      upcomingFixtures,
-      history,
-      teamStrength,
-      opponentStrength,
-    );
+    const upcomingFixtures = attachExpectedPoints(el, position, rawUpcomingFixtures, history, teamStrengthMap);
+    const expectedPoints = upcomingFixtures[0]?.expectedPoints ?? 0;
 
     return {
       id: el.id,

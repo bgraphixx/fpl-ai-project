@@ -75,18 +75,29 @@ export function calculateExpectedPoints(inputs: ExpectedPointsInputs): number {
     expectedDefensivePoints = csProbability * 1;
   }
 
-  // 5. Bonus Points
-  let expectedBonus = 0;
-  if (bps > 15) {
-    expectedBonus = (bps - 15) / 10;
-  }
+  // 5. Bonus Points — smooth logistic curve instead of a bare linear ramp:
+  // still a heuristic (no actual past-bonus-points ground truth exists in
+  // this DB to fit against), but naturally bounded to the real 0-3 max
+  // (the old linear formula had no upper cap and could exceed 3), and ramps
+  // gradually through the ~20-30 BPS range where bonus typically starts
+  // showing up, rather than snapping on at exactly 15.
+  const expectedBonus = 3 / (1 + Math.exp(-(bps - 24) / 6));
 
-  const baseExpectedPoints = expectedMinsPoints + expectedAttackingPoints + expectedDefensivePoints + expectedBonus;
+  // Points are split into an "appearance" component (60+ mins = 2pts, just
+  // for playing) and a "performance" component (goals/assists/clean
+  // sheets/bonus) — kept separate so the fixture-difficulty multiplier
+  // below can scale only performance. Whether a player gets 60 minutes
+  // isn't meaningfully affected by how hard the fixture is; how well they
+  // perform in those minutes is.
+  const baseAppearancePoints = expectedMinsPoints;
+  const basePerformancePoints = expectedAttackingPoints + expectedDefensivePoints + expectedBonus;
 
   // 6. Cold Start / Gameweek 1 Bias Correction (Bayesian Prior)
-  let adjustedPoints = baseExpectedPoints;
+  let adjustedAppearancePoints = baseAppearancePoints;
+  let adjustedPerformancePoints = basePerformancePoints;
   if (minutesPerGame < 45) {
-    let historicalPrior = 0;
+    let historicalAppearancePoints = 0;
+    let historicalPerformancePoints = 0;
 
     // Use historical xG/xA if they played over 450 minutes (approx 5 full games) last season
     const hMins = inputs.historicalMinutes || 0;
@@ -96,7 +107,7 @@ export function calculateExpectedPoints(inputs: ExpectedPointsInputs): number {
       const hXA = (inputs.historicalXA || 0) / hAppearances;
       const hXGC = (inputs.historicalXGC || 0) / hAppearances;
       const hBPS = (inputs.historicalBPS || 0) / hAppearances;
-      
+
       let hAttPts = 0;
       if (position === "FWD") hAttPts = hXG * 4 + hXA * 3;
       else if (position === "MID") hAttPts = hXG * 5 + hXA * 3;
@@ -104,21 +115,22 @@ export function calculateExpectedPoints(inputs: ExpectedPointsInputs): number {
 
       let hCsProb = Math.exp(-hXGC);
       hCsProb = Math.max(0.05, Math.min(0.6, hCsProb));
-      
+
       let hDefPts = 0;
       if (position === "GK" || position === "DEF") hDefPts = hCsProb * 4;
       else if (position === "MID") hDefPts = hCsProb * 1;
 
-      const hBonus = hBPS > 15 ? (hBPS - 15) / 10 : 0;
-      const hMinsPts = 2; // Assuming they start if we project them
+      const hBonus = 3 / (1 + Math.exp(-(hBPS - 24) / 6));
 
-      historicalPrior = hMinsPts + hAttPts + hDefPts + hBonus;
+      historicalPerformancePoints = hAttPts + hDefPts + hBonus;
+      historicalAppearancePoints = 2; // Assuming they start if we project them
 
       // Penalize impact subs (played a lot of minutes, but rarely started)
       if (inputs.historicalStarts !== undefined) {
         const startRatio = inputs.historicalStarts / (hMins / 90);
         if (startRatio < 0.5) {
-          historicalPrior *= 0.6; // Heavy penalty for rotation risks
+          historicalPerformancePoints *= 0.6; // Heavy penalty for rotation risks
+          historicalAppearancePoints *= 0.6;
         }
       }
     } else {
@@ -126,11 +138,16 @@ export function calculateExpectedPoints(inputs: ExpectedPointsInputs): number {
       let pricePrior = 0;
       if (position === "FWD" || position === "MID") pricePrior = (price / 10) * 5.0;
       else pricePrior = (price / 10) * 7.0;
-      historicalPrior = pointsPerGame > 0 ? pointsPerGame : pricePrior;
+      const totalPrior = pointsPerGame > 0 ? pointsPerGame : pricePrior;
+      // No stat breakdown available for this fallback — treat it all as
+      // "performance" so it's still subject to the fixture multiplier below.
+      historicalPerformancePoints = totalPrior;
+      historicalAppearancePoints = 0;
     }
 
-    const priorWeight = 1 - (minutesPerGame / 45); 
-    adjustedPoints = (baseExpectedPoints * (1 - priorWeight)) + (historicalPrior * priorWeight);
+    const priorWeight = 1 - (minutesPerGame / 45);
+    adjustedAppearancePoints = (baseAppearancePoints * (1 - priorWeight)) + (historicalAppearancePoints * priorWeight);
+    adjustedPerformancePoints = (basePerformancePoints * (1 - priorWeight)) + (historicalPerformancePoints * priorWeight);
   }
 
   // 7. Granular Fixture Difficulty Multiplier
@@ -158,7 +175,7 @@ export function calculateExpectedPoints(inputs: ExpectedPointsInputs): number {
     fdrMultiplier = Math.max(0.6, Math.min(1.4, fdrMultiplier));
   }
 
-  let finalProjected = adjustedPoints * fdrMultiplier * playChance;
+  let finalProjected = (adjustedAppearancePoints + adjustedPerformancePoints * fdrMultiplier) * playChance;
   finalProjected = Math.max(0, finalProjected);
   return Math.round(finalProjected * 100) / 100;
 }

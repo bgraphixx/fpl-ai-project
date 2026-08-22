@@ -20,11 +20,34 @@ type Fixture = {
   team_a_difficulty: number;
 };
 
-function TeamBadge({ team }: { team: BootstrapTeam }) {
+function TeamBadge({
+  team,
+  align = "left",
+}: {
+  team: BootstrapTeam;
+  align?: "left" | "right";
+}) {
   return (
-    <div className="flex flex-1 min-w-0 items-center gap-2.5">
-      <ClubBadge club={team.short_name} size={32} />
-      <span className="cap truncate text-[15px] font-semibold">{team.name}</span>
+    <div
+      className={`flex flex-1 min-w-0 items-center gap-2.5 ${
+        align === "right" ? "justify-end" : "justify-start"
+      }`}
+    >
+      {align === "right" ? (
+        <>
+          <span className="cap truncate text-[15px] font-semibold text-right">
+            {team.name}
+          </span>
+          <ClubBadge club={team.short_name} size={32} />
+        </>
+      ) : (
+        <>
+          <ClubBadge club={team.short_name} size={32} />
+          <span className="cap truncate text-[15px] font-semibold text-left">
+            {team.name}
+          </span>
+        </>
+      )}
     </div>
   );
 }
@@ -107,7 +130,7 @@ export function FixturesView({
               className="rounded-2xl border border-border-soft bg-surface-2 p-3.5"
             >
               <div className="mb-2 flex items-center gap-2">
-                <TeamBadge team={home} />
+                <TeamBadge team={home} align="right" />
                 <div className="cap px-2 text-center text-sm font-bold text-text-muted">
                   {f.finished || f.started
                     ? `${f.team_h_score ?? 0} - ${f.team_a_score ?? 0}`
@@ -117,12 +140,16 @@ export function FixturesView({
                         minute: "2-digit",
                       })}
                 </div>
-                <TeamBadge team={away} />
+                <TeamBadge team={away} align="left" />
               </div>
-              <div className="flex items-center justify-between border-t border-border-soft pt-2 text-xs text-text-dim">
-                <span>Difficulty</span>
-                <div className="flex gap-2">
+              <div className="flex items-center gap-2 border-t border-border-soft pt-2">
+                <div className="flex flex-1 justify-end">
                   <FdrChip difficulty={f.team_h_difficulty} />
+                </div>
+                <div className="cap px-2 text-center text-xs font-medium text-text-dim">
+                  Difficulty
+                </div>
+                <div className="flex flex-1 justify-start">
                   <FdrChip difficulty={f.team_a_difficulty} />
                 </div>
               </div>
