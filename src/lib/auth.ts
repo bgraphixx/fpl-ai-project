@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 // sessions require an OAuth-style adapter account link that Credentials
 // doesn't create. See plan §10 "DB session vs JWT session".
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
