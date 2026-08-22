@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { clubColor, clubTextColor, fdrColor } from "@/lib/club-colors";
+import { fdrColor } from "@/lib/club-colors";
+import { ClubBadge } from "@/components/ClubBadge";
 
 type BootstrapEvent = { id: number; deadline_time: string };
 type BootstrapTeam = { id: number; name: string; short_name: string };
@@ -21,14 +22,9 @@ type Fixture = {
 
 function TeamBadge({ team }: { team: BootstrapTeam }) {
   return (
-    <div className="flex flex-1 items-center gap-2.5">
-      <div
-        className="cap flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-[11px] font-bold"
-        style={{ background: clubColor(team.short_name), color: clubTextColor(team.short_name) }}
-      >
-        {team.short_name}
-      </div>
-      <span className="cap text-[15px] font-semibold">{team.name}</span>
+    <div className="flex flex-1 min-w-0 items-center gap-2.5">
+      <ClubBadge club={team.short_name} size={32} />
+      <span className="cap truncate text-[15px] font-semibold">{team.name}</span>
     </div>
   );
 }

@@ -1,6 +1,5 @@
-import Image from "next/image";
-import { clubColor, clubTextColor } from "@/lib/club-colors";
-import { clubLogoSrc } from "@/lib/club-logos";
+import { ClubBadge } from "@/components/ClubBadge";
+import { FixtureChips } from "@/components/FixtureChips";
 import type { DisplayPlayer } from "@/types/ui";
 
 const AVAILABILITY_DOT: Record<NonNullable<DisplayPlayer["availability"]>, string> = {
@@ -9,23 +8,30 @@ const AVAILABILITY_DOT: Record<NonNullable<DisplayPlayer["availability"]>, strin
   unavailable: "text-danger",
 };
 
-// Player badge for the pitch view: club-colored square with crest SVG,
-// name + price underneath, optional captain/vice-captain armband badge.
+// Player badge for the pitch view: club crest, name underneath, and either
+// price, points, or upcoming-fixture pills depending on the page — plus an
+// optional captain/vice-captain armband badge.
+//
+// Chips are flex-1/min-w-0 rather than a fixed width so a row of 5 always
+// fits on one line and shrinks together instead of wrapping (no horizontal
+// scroll) — see PitchFormation, which drops flex-wrap for the same reason.
 export function PlayerChip({
   player,
   onClick,
+  showPrice = true,
+  showPoints = false,
+  fixturesCount = 0,
 }: {
   player: DisplayPlayer;
   onClick?: () => void;
+  showPrice?: boolean;
+  showPoints?: boolean;
+  fixturesCount?: 0 | 1 | 3;
 }) {
-  const bg = clubColor(player.club);
-  const fg = clubTextColor(player.club);
-  const logoSrc = clubLogoSrc(player.club);
-
   return (
     <button
       onClick={onClick}
-      className="flex w-[70px] flex-col items-center gap-1 sm:w-[78px]"
+      className="flex min-w-0 flex-1 flex-col items-center gap-1"
       type="button"
     >
       <div className="relative">
@@ -39,32 +45,29 @@ export function PlayerChip({
             V
           </span>
         )}
-        <div
-          className="cap flex h-10 w-10 items-center justify-center rounded-[9px] text-[13px] font-bold shadow-lg sm:h-11 sm:w-11"
-          style={{ background: bg, color: fg }}
-        >
-          {logoSrc ? (
-            <Image
-              src={logoSrc}
-              alt={player.club}
-              width={28}
-              height={28}
-              className="object-contain drop-shadow-sm sm:h-[30px] sm:w-[30px]"
-              unoptimized
-            />
-          ) : (
-            player.club
-          )}
-        </div>
+        <ClubBadge club={player.club} size={38} />
       </div>
-      <div className="min-w-[62px] rounded-md bg-surface/90 px-1.5 py-0.5 text-center">
-        <div className="cap truncate text-[12px] font-semibold leading-tight">{player.name}</div>
-        <div className="flex items-center justify-center gap-1 text-[10px] font-semibold text-accent">
-          £{player.price.toFixed(1)}
-          {player.availability && (
-            <span className={AVAILABILITY_DOT[player.availability]}>●</span>
-          )}
+      <div className="min-w-0 max-w-full rounded-md bg-surface/90 px-1.5 py-0.5 text-center">
+        <div className="cap truncate text-[11px] font-semibold leading-tight sm:text-[12px]">
+          {player.name}
         </div>
+        {showPoints ? (
+          <div className="cap text-[11px] font-bold text-accent">
+            {(player.gwPoints ?? 0) * (player.multiplier ?? 1)} pts
+          </div>
+        ) : (
+          <div className="flex items-center justify-center gap-1 text-[10px] font-semibold text-accent">
+            {showPrice && <span>£{player.price.toFixed(1)}</span>}
+            {player.availability && (
+              <span className={AVAILABILITY_DOT[player.availability]}>●</span>
+            )}
+          </div>
+        )}
+        {fixturesCount > 0 && (
+          <div className="mt-0.5 flex justify-center">
+            <FixtureChips fixtures={player.upcomingFixtures?.slice(0, fixturesCount)} size="sm" />
+          </div>
+        )}
       </div>
     </button>
   );

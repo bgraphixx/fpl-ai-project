@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
-import { clubColor, clubTextColor } from "@/lib/club-colors";
-import { clubLogoSrc } from "@/lib/club-logos";
+import { ClubBadge } from "@/components/ClubBadge";
 import { PitchFormation } from "@/components/PitchFormation";
 import { RefreshSquadButton } from "@/components/RefreshSquadButton";
+import { PlayerDetailPanel, type PlayerDetail } from "@/components/PlayerDetailPanel";
 import type { CurrentSquad } from "@/lib/squad";
 import type { DisplayPlayer } from "@/types/ui";
 import type { Position } from "@/types/fpl";
@@ -17,37 +16,52 @@ const POSITION_ORDER: { key: Position; label: string }[] = [
   { key: "FWD", label: "Forwards" },
 ];
 
-function ClubBadgeSmall({ club }: { club: string }) {
-  const logoSrc = clubLogoSrc(club);
-  return (
-    <div
-      className="cap flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-[11px] font-bold"
-      style={{ background: clubColor(club), color: clubTextColor(club) }}
-    >
-      {logoSrc ? (
-        <Image
-          src={logoSrc}
-          alt={club}
-          width={20}
-          height={20}
-          className="object-contain"
-          unoptimized
-        />
-      ) : (
-        club
-      )}
-    </div>
-  );
+const STAT_LABELS: Record<string, string> = {
+  minutes: "Minutes",
+  goals_scored: "Goals",
+  assists: "Assists",
+  clean_sheets: "Clean sheet",
+  goals_conceded: "Conceded",
+  own_goals: "Own goal",
+  penalties_saved: "Pen. saved",
+  penalties_missed: "Pen. missed",
+  yellow_cards: "Yellow card",
+  red_cards: "Red card",
+  saves: "Saves",
+  bonus: "Bonus",
+  defensive_contribution: "Defense",
+};
+
+function toPointsDetail(player: DisplayPlayer): PlayerDetail {
+  const breakdown = (player.gwStatsBreakdown ?? []).filter((s) => s.points !== 0);
+  return {
+    id: player.id,
+    name: player.name,
+    club: player.club,
+    position: player.position,
+    badge: player.isCaptain ? "CAPTAIN" : player.isViceCaptain ? "VICE" : undefined,
+    stats: breakdown.length
+      ? breakdown.map((s) => ({
+          label: STAT_LABELS[s.identifier] ?? s.identifier,
+          value: `${s.value} (${s.points > 0 ? "+" : ""}${s.points})`,
+          tone: s.points > 0 ? ("success" as const) : ("warning" as const),
+        }))
+      : [{ label: "Points", value: "No scoring stats yet" }],
+  };
 }
 
-function PlayerPointsRow({ player }: { player: DisplayPlayer }) {
+function PlayerPointsRow({ player, onClick }: { player: DisplayPlayer; onClick: () => void }) {
   const raw = player.gwPoints ?? 0;
   const multiplier = player.multiplier ?? 1;
   const contribution = raw * multiplier;
 
   return (
-    <div className="flex items-center gap-3 border-b border-border-soft/60 py-2.5 last:border-b-0">
-      <ClubBadgeSmall club={player.club} />
+    <button
+      onClick={onClick}
+      type="button"
+      className="flex w-full items-center gap-3 border-b border-border-soft/60 py-2.5 text-left last:border-b-0"
+    >
+      <ClubBadge club={player.club} size={32} />
       <div className="flex-1">
         <div className="cap flex items-center gap-1.5 text-[15px] font-semibold leading-tight">
           {player.name}
@@ -68,12 +82,13 @@ function PlayerPointsRow({ player }: { player: DisplayPlayer }) {
         {contribution}
         {multiplier > 1 && <span className="ml-1 text-xs text-text-dim">({raw} × {multiplier})</span>}
       </div>
-    </div>
+    </button>
   );
 }
 
 export function PointsView({ squad }: { squad: CurrentSquad }) {
   const [view, setView] = useState<"pitch" | "table">("pitch");
+  const [detail, setDetail] = useState<PlayerDetail | null>(null);
   const benchPoints = squad.bench.reduce((sum, p) => sum + (p.gwPoints ?? 0), 0);
 
   // Group starting XI by position for table view
@@ -84,120 +99,128 @@ export function PointsView({ squad }: { squad: CurrentSquad }) {
   })).filter((g) => g.players.length > 0);
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between">
-        <h1 className="cap text-2xl font-bold">Points</h1>
-        <RefreshSquadButton lastSyncedAt={squad.lastSyncedAt} />
-      </div>
-
-      <div className="rounded-2xl border border-success-deep bg-gradient-to-br from-[#14351f] to-[#0c1c13] p-5">
-        <div className="cap text-xs font-bold uppercase tracking-widest text-accent">
-          Gameweek {squad.pointsGameweek}
+    <div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-8">
+      <div className="flex flex-1 flex-col gap-5">
+        <div className="flex items-center justify-between">
+          <h1 className="cap text-2xl font-bold">Points</h1>
+          <RefreshSquadButton lastSyncedAt={squad.lastSyncedAt} />
         </div>
-        <div className="cap mt-1.5 text-5xl font-bold leading-none">{squad.points ?? "–"}</div>
-        {squad.points === null && (
-          <p className="mt-1 text-xs text-[#cdd8d1]">
-            No live score yet — this squad hasn&apos;t been synced from FPL. Hit Refresh.
-          </p>
-        )}
-        <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-[#cdd8d1]">
-          <span>
-            Rank{" "}
-            <b className="text-text">
-              {squad.rank ? squad.rank.toLocaleString() : "—"}
-            </b>
-          </span>
-          <span>
-            Season total <b className="text-text">{squad.totalPoints ?? "–"}</b>
-          </span>
-          {(squad.transferCost ?? 0) > 0 && (
-            <span className="text-captain">
-              Hit taken <b>−{squad.transferCost}</b>
-            </span>
+
+        <div className="rounded-2xl border border-success-deep bg-gradient-to-br from-[#14351f] to-[#0c1c13] p-5">
+          <div className="cap text-xs font-bold uppercase tracking-widest text-accent">
+            Gameweek {squad.pointsGameweek}
+          </div>
+          <div className="cap mt-1.5 text-5xl font-bold leading-none">{squad.points ?? "–"}</div>
+          {squad.points === null && (
+            <p className="mt-1 text-xs text-[#cdd8d1]">
+              No live score yet — this squad hasn&apos;t been synced from FPL. Hit Refresh.
+            </p>
           )}
-        </div>
-      </div>
-
-      <div className="flex gap-1 rounded-xl border border-border bg-surface-2 p-1">
-        <button
-          onClick={() => setView("pitch")}
-          className={`cap flex-1 rounded-lg py-2 text-[15px] font-bold ${
-            view === "pitch" ? "bg-accent text-accent-ink" : "text-text-muted"
-          }`}
-          type="button"
-        >
-          ◈ Pitch
-        </button>
-        <button
-          onClick={() => setView("table")}
-          className={`cap flex-1 rounded-lg py-2 text-[15px] font-bold ${
-            view === "table" ? "bg-accent text-accent-ink" : "text-text-muted"
-          }`}
-          type="button"
-        >
-          ▦ Table
-        </button>
-      </div>
-
-      {view === "pitch" ? (
-        <>
-          <PitchFormation players={squad.starting} />
-
-          <div className="rounded-xl border border-border bg-surface-2 p-2.5">
-            <div className="mb-1.5 flex items-center justify-between px-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-text-dim">
-                Bench
+          <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-[#cdd8d1]">
+            <span>
+              Rank <b className="text-text">{squad.rank ? squad.rank.toLocaleString() : "—"}</b>
+            </span>
+            <span>
+              Season total <b className="text-text">{squad.totalPoints ?? "–"}</b>
+            </span>
+            {(squad.transferCost ?? 0) > 0 && (
+              <span className="text-captain">
+                Hit taken <b>−{squad.transferCost}</b>
               </span>
-              <span className="text-[10px] text-text-dim">{benchPoints} pts (not counted)</span>
-            </div>
-            <div className="flex justify-between gap-1.5">
-              {squad.bench.map((p) => (
-                <div key={p.id} className="flex-1 text-center">
-                  <div className="cap truncate text-xs font-semibold">{p.name}</div>
-                  <div className="text-[10px] text-text-muted">
-                    {p.gwPoints ?? 0} pts
-                  </div>
-                </div>
-              ))}
-            </div>
+            )}
           </div>
-        </>
-      ) : (
-        <>
-          <div>
-            <h2 className="cap mb-2 text-sm font-bold uppercase tracking-wider text-text-dim">
-              Starting XI
-            </h2>
-            <div className="overflow-hidden rounded-2xl border border-border-soft">
-              {startingGroups.map((group) => (
-                <div key={group.key}>
-                  <div className="border-b border-border-soft/60 bg-surface-2/50 px-4 py-2 text-[11px] font-bold uppercase tracking-wider text-text-dim">
-                    {group.label}
-                  </div>
-                  <div className="px-4">
-                    {group.players.map((p) => (
-                      <PlayerPointsRow key={p.id} player={p} />
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+        </div>
 
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <h2 className="cap text-sm font-bold uppercase tracking-wider text-text-dim">Bench</h2>
-              <span className="text-xs text-text-dim">{benchPoints} pts (not counted)</span>
+        <div className="flex gap-1 rounded-xl border border-border bg-surface-2 p-1">
+          <button
+            onClick={() => setView("pitch")}
+            className={`cap flex-1 rounded-lg py-2 text-[15px] font-bold ${
+              view === "pitch" ? "bg-accent text-accent-ink" : "text-text-muted"
+            }`}
+            type="button"
+          >
+            ◈ Pitch
+          </button>
+          <button
+            onClick={() => setView("table")}
+            className={`cap flex-1 rounded-lg py-2 text-[15px] font-bold ${
+              view === "table" ? "bg-accent text-accent-ink" : "text-text-muted"
+            }`}
+            type="button"
+          >
+            ▦ Table
+          </button>
+        </div>
+
+        {view === "pitch" ? (
+          <>
+            <PitchFormation
+              players={squad.starting}
+              showPrice={false}
+              showPoints
+              onSelectPlayer={(p) => setDetail(toPointsDetail(p))}
+            />
+
+            <div className="rounded-xl border border-border bg-surface-2 p-2.5">
+              <div className="mb-1.5 flex items-center justify-between px-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-text-dim">
+                  Bench
+                </span>
+                <span className="text-[10px] text-text-dim">{benchPoints} pts (not counted)</span>
+              </div>
+              <div className="flex justify-between gap-1.5">
+                {squad.bench.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => setDetail(toPointsDetail(p))}
+                    type="button"
+                    className="flex-1 text-center"
+                  >
+                    <div className="cap truncate text-xs font-semibold">{p.name}</div>
+                    <div className="text-[10px] text-text-muted">{p.gwPoints ?? 0} pts</div>
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="rounded-2xl border border-border-soft bg-surface-2/40 px-4 opacity-70">
-              {squad.bench.map((p) => (
-                <PlayerPointsRow key={p.id} player={p} />
-              ))}
+          </>
+        ) : (
+          <>
+            <div>
+              <h2 className="cap mb-2 text-sm font-bold uppercase tracking-wider text-text-dim">
+                Starting XI
+              </h2>
+              <div className="overflow-hidden rounded-2xl border border-border-soft">
+                {startingGroups.map((group) => (
+                  <div key={group.key}>
+                    <div className="border-b border-border-soft/60 bg-surface-2/50 px-4 py-2 text-[11px] font-bold uppercase tracking-wider text-text-dim">
+                      {group.label}
+                    </div>
+                    <div className="px-4">
+                      {group.players.map((p) => (
+                        <PlayerPointsRow key={p.id} player={p} onClick={() => setDetail(toPointsDetail(p))} />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        </>
-      )}
+
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <h2 className="cap text-sm font-bold uppercase tracking-wider text-text-dim">Bench</h2>
+                <span className="text-xs text-text-dim">{benchPoints} pts (not counted)</span>
+              </div>
+              <div className="rounded-2xl border border-border-soft bg-surface-2/40 px-4 opacity-70">
+                {squad.bench.map((p) => (
+                  <PlayerPointsRow key={p.id} player={p} onClick={() => setDetail(toPointsDetail(p))} />
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+
+      <PlayerDetailPanel detail={detail} onClose={() => setDetail(null)} />
     </div>
   );
 }
-

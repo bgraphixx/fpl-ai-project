@@ -33,4 +33,8 @@ export type DisplayPlayer = {
   gwPoints?: number;
   multiplier?: number;
   upcomingFixtures?: UpcomingFixture[];
+  // Per-stat point breakdown for the current gameweek (goals, assists, bonus,
+  // etc.) — from FPL's live `explain` array. Only meaningful alongside
+  // gwPoints, for the Points page's "why did they score X" detail view.
+  gwStatsBreakdown?: { identifier: string; points: number; value: number }[];
 };

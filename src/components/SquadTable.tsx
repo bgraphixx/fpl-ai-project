@@ -1,9 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Image from "next/image";
-import { clubColor, clubTextColor } from "@/lib/club-colors";
-import { clubLogoSrc } from "@/lib/club-logos";
+import { ClubBadge } from "@/components/ClubBadge";
 import type { DisplayPlayer } from "@/types/ui";
 import type { Position } from "@/types/fpl";
 
@@ -21,29 +19,6 @@ const POSITION_ORDER: { key: Position; label: string }[] = [
   { key: "MID", label: "Midfielders" },
   { key: "FWD", label: "Forwards" },
 ];
-
-function ClubBadge({ club }: { club: string }) {
-  const logoSrc = clubLogoSrc(club);
-  return (
-    <div
-      className="cap mr-2.5 flex h-7 w-7 items-center justify-center rounded-md text-[10px] font-bold"
-      style={{ background: clubColor(club), color: clubTextColor(club) }}
-    >
-      {logoSrc ? (
-        <Image
-          src={logoSrc}
-          alt={club}
-          width={18}
-          height={18}
-          className="object-contain"
-          unoptimized
-        />
-      ) : (
-        club
-      )}
-    </div>
-  );
-}
 
 export function SquadTable({
   players,
@@ -92,7 +67,7 @@ export function SquadTable({
                 className="flex w-full items-center border-b border-border-soft/60 px-4 py-2.5 text-left last:border-b-0 hover:bg-surface-2"
                 type="button"
               >
-                <ClubBadge club={p.club} />
+                <ClubBadge club={p.club} size={28} className="mr-2.5" />
                 <div className="flex-1">
                   <div className="cap text-[15px] font-semibold leading-tight">{p.name}</div>
                   <div className="text-[10px] text-text-dim">{p.position}</div>

@@ -49,7 +49,11 @@ type FplPicksResponse = {
 };
 
 type FplLiveResponse = {
-  elements: { id: number; stats: { total_points: number } }[];
+  elements: {
+    id: number;
+    stats: { total_points: number };
+    explain: { stats: { identifier: string; points: number; value: number }[] }[];
+  }[];
 };
 
 export class TeamNotLinkedError extends Error {
@@ -92,21 +96,25 @@ export type CurrentSquad = {
 };
 
 // Joins a stored (or freshly-pulled) pick list against current bootstrap +
-// live-points data, so prices/injury-status/points are always up to date
-// even when the squad composition itself is read from a stale snapshot.
+// live-points + fixtures data, so prices/injury-status/points/fixtures are
+// always up to date even when the squad composition itself is read from a
+// stale snapshot. `fixtures` is optional — the Points page's live-scoring
+// path doesn't need it and skips the extra (still-cached) fetch.
 function joinDisplaySquad(
   picks: StoredPick[],
   bootstrap: Bootstrap,
   live: FplLiveResponse | null,
+  fixtures?: Fixture[],
 ): { starting: DisplayPlayer[]; bench: DisplayPlayer[] } {
   const teamById = new Map(bootstrap.teams.map((t) => [t.id, t.short_name]));
   const elementById = new Map(bootstrap.elements.map((e) => [e.id, e]));
-  const livePointsById = new Map((live?.elements ?? []).map((e) => [e.id, e.stats.total_points]));
+  const liveById = new Map((live?.elements ?? []).map((e) => [e.id, e]));
 
   const toDisplay = (pick: StoredPick): DisplayPlayer | null => {
     const el = elementById.get(pick.id);
     if (!el) return null; // player no longer exists in bootstrap (rare)
     const chance = el.chance_of_playing_this_round;
+    const liveEl = liveById.get(pick.id);
     return {
       id: el.id,
       name: el.web_name,
@@ -119,8 +127,10 @@ function joinDisplaySquad(
       availability: chance === null || chance >= 75 ? "available" : chance >= 25 ? "doubtful" : "unavailable",
       isCaptain: pick.isCaptain,
       isViceCaptain: pick.isViceCaptain,
-      gwPoints: livePointsById.get(pick.id),
+      gwPoints: liveEl?.stats.total_points,
       multiplier: pick.isCaptain ? 2 : 1,
+      gwStatsBreakdown: liveEl?.explain[0]?.stats,
+      upcomingFixtures: fixtures ? computeUpcomingFixtures(fixtures, el.team, teamById) : undefined,
     };
   };
 
@@ -141,9 +151,10 @@ export async function refreshSquadFromFpl(userId: string): Promise<CurrentSquad>
   if (!pickableGw) throw new NoActiveGameweekError();
   const targetGw = targetGameweek(bootstrap.events) ?? pickableGw;
 
-  const [picks, live] = await Promise.all([
+  const [picks, live, fixtures] = await Promise.all([
     getEntryPicks(user.fplTeamId, pickableGw.id) as Promise<FplPicksResponse>,
     getEventLive(pickableGw.id).catch(() => null) as Promise<FplLiveResponse | null>,
+    getFixtures() as Promise<Fixture[]>,
   ]);
 
   const storedPicks: StoredPick[] = picks.picks.map((p) => ({
@@ -169,7 +180,7 @@ export async function refreshSquadFromFpl(userId: string): Promise<CurrentSquad>
     },
   });
 
-  const { starting, bench } = joinDisplaySquad(storedPicks, bootstrap, live);
+  const { starting, bench } = joinDisplaySquad(storedPicks, bootstrap, live, fixtures);
 
   return {
     gameweek: targetGw.id,
@@ -199,7 +210,10 @@ export async function getStoredSquad(userId: string): Promise<CurrentSquad | nul
   });
   if (!snapshot) return null;
 
-  const bootstrap = (await getBootstrapStatic()) as Bootstrap;
+  const [bootstrap, fixtures] = await Promise.all([
+    getBootstrapStatic() as Promise<Bootstrap>,
+    getFixtures() as Promise<Fixture[]>,
+  ]);
   const pickableGw = pickableGameweek(bootstrap.events);
   const targetGw = targetGameweek(bootstrap.events) ?? pickableGw;
   const live = pickableGw
@@ -207,7 +221,7 @@ export async function getStoredSquad(userId: string): Promise<CurrentSquad | nul
     : null;
 
   const storedPicks = snapshot.players as unknown as StoredPick[];
-  const { starting, bench } = joinDisplaySquad(storedPicks, bootstrap, live);
+  const { starting, bench } = joinDisplaySquad(storedPicks, bootstrap, live, fixtures);
 
   return {
     gameweek: targetGw?.id ?? snapshot.gameweek,

@@ -8,7 +8,8 @@ import { GeneratingScreen } from "@/components/GeneratingScreen";
 import { PitchFormation } from "@/components/PitchFormation";
 import { SquadTable } from "@/components/SquadTable";
 import { PlayerDetailPanel, type PlayerDetail } from "@/components/PlayerDetailPanel";
-import type { DisplayPlayer, StoredPick } from "@/types/ui";
+import { DisplayModeToggle, type DisplayMode } from "@/components/DisplayModeToggle";
+import type { DisplayPlayer, StoredPick, UpcomingFixture } from "@/types/ui";
 import type { Position } from "@/types/fpl";
 
 type BuildResult = {
@@ -22,7 +23,13 @@ type BuildResult = {
   perPlayer: { id: number; summary: string; detail: string }[];
 };
 
-type PlayerInfo = { name: string; club: string; price: number; position: Position };
+type PlayerInfo = {
+  name: string;
+  club: string;
+  price: number;
+  position: Position;
+  upcomingFixtures?: UpcomingFixture[];
+};
 
 type Stage = "confirm" | "generating" | "results" | "error";
 
@@ -33,6 +40,7 @@ export function BuildFlow({ gameweek }: { gameweek: number }) {
   const [result, setResult] = useState<BuildResult | null>(null);
   const [players, setPlayers] = useState<Record<number, PlayerInfo>>({});
   const [view, setView] = useState<"pitch" | "table">("pitch");
+  const [displayMode, setDisplayMode] = useState<DisplayMode>("price");
   const [error, setError] = useState<string | null>(null);
   const [detail, setDetail] = useState<PlayerDetail | null>(null);
   const [saving, setSaving] = useState(false);
@@ -122,6 +130,7 @@ export function BuildFlow({ gameweek }: { gameweek: number }) {
         price: info?.price ?? 0,
         isCaptain: id === result.captainId,
         isViceCaptain: id === result.viceCaptainId,
+        upcomingFixtures: info?.upcomingFixtures,
       };
     };
     const squadPlayers = result.squad.map(toDisplay);
@@ -140,6 +149,8 @@ export function BuildFlow({ gameweek }: { gameweek: number }) {
         badge: p.isCaptain ? "CAPTAIN" : p.isViceCaptain ? "VICE" : undefined,
         stats: [],
         reasoning: reasoning?.detail ?? reasoning?.summary ?? "No detail available.",
+        fixtures: p.upcomingFixtures,
+        fetchHistory: true,
       });
     }
 
@@ -170,8 +181,15 @@ export function BuildFlow({ gameweek }: { gameweek: number }) {
 
           <Card className="text-[13px] leading-snug text-[#cdd8d1]">{result.summary}</Card>
 
+          {view === "pitch" && <DisplayModeToggle mode={displayMode} onChange={setDisplayMode} />}
+
           {view === "pitch" ? (
-            <PitchFormation players={startingXIPlayers} onSelectPlayer={openDetail} />
+            <PitchFormation
+              players={startingXIPlayers}
+              onSelectPlayer={openDetail}
+              showPrice={displayMode === "price"}
+              fixturesCount={displayMode === "price" ? 0 : displayMode === "next1" ? 1 : 3}
+            />
           ) : (
             <SquadTable players={squadPlayers} onSelectPlayer={openDetail} />
           )}

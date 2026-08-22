@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import {
   getSquad,
@@ -29,7 +30,8 @@ async function loadData(userId: string): Promise<LoadResult> {
 
 export default async function TransfersPage() {
   const session = await auth();
-  const result = await loadData(session!.user.id);
+  if (!session?.user) redirect("/login");
+  const result = await loadData(session.user.id);
 
   if (result.kind === "ok") {
     return <TransfersContainer squad={result.squad} allPlayers={result.allPlayers} />;

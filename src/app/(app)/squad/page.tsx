@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getBootstrapStatic, getFixtures } from "@/lib/fpl";
 import { targetGameweek } from "@/lib/gameweek";
@@ -39,7 +40,8 @@ async function loadDeadline(): Promise<{ deadlineISO: string; gameweek: number; 
 
 export default async function SquadPage() {
   const session = await auth();
-  const [result, deadline] = await Promise.all([loadSquad(session!.user.id), loadDeadline()]);
+  if (!session?.user) redirect("/login");
+  const [result, deadline] = await Promise.all([loadSquad(session.user.id), loadDeadline()]);
 
   if (result.kind === "ok") return <SquadView squad={result.squad} deadline={deadline} />;
 

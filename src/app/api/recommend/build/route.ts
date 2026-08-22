@@ -81,7 +81,10 @@ export async function POST(request: Request) {
   const players = Object.fromEntries(
     candidateSignals
       .filter((s) => aiResult.squad.includes(s.id))
-      .map((s) => [s.id, { name: s.name, club: s.club, price: s.price, position: s.position }]),
+      .map((s) => [
+        s.id,
+        { name: s.name, club: s.club, price: s.price, position: s.position, upcomingFixtures: s.upcomingFixtures },
+      ]),
   );
 
   const recommendation = await prisma.recommendation.create({

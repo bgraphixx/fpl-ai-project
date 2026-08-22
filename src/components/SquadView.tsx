@@ -7,6 +7,7 @@ import { SquadTable } from "@/components/SquadTable";
 import { PlayerDetailPanel, type PlayerDetail } from "@/components/PlayerDetailPanel";
 import { Countdown } from "@/components/Countdown";
 import { RefreshSquadButton } from "@/components/RefreshSquadButton";
+import { DisplayModeToggle, type DisplayMode } from "@/components/DisplayModeToggle";
 import type { DisplayPlayer } from "@/types/ui";
 import type { CurrentSquad } from "@/lib/squad";
 
@@ -27,10 +28,8 @@ function toDetail(p: DisplayPlayer): PlayerDetail {
         tone: p.availability === "available" ? "success" : p.availability === "doubtful" ? "warning" : undefined,
       },
     ],
-    reasoning:
-      p.availability === "unavailable"
-        ? `${p.name} is currently flagged as unavailable — check the latest news before relying on them this gameweek.`
-        : `${p.name}'s recent form and ownership at a glance. Full AI reasoning is available from the recommendation flows.`,
+    fixtures: p.upcomingFixtures,
+    fetchHistory: true,
   };
 }
 
@@ -38,6 +37,7 @@ type Deadline = { deadlineISO: string; gameweek: number; fixtureCount: number } 
 
 export function SquadView({ squad, deadline }: { squad: CurrentSquad; deadline: Deadline }) {
   const [view, setView] = useState<"pitch" | "table">("pitch");
+  const [displayMode, setDisplayMode] = useState<DisplayMode>("price");
   const [detail, setDetail] = useState<PlayerDetail | null>(null);
 
   const all = [...squad.starting, ...squad.bench];
@@ -101,11 +101,15 @@ export function SquadView({ squad, deadline }: { squad: CurrentSquad; deadline: 
           </button>
         </div>
 
+        <DisplayModeToggle mode={displayMode} onChange={setDisplayMode} />
+
         {view === "pitch" ? (
           <>
             <PitchFormation
               players={squad.starting}
               onSelectPlayer={(p) => setDetail(toDetail(p))}
+              showPrice={displayMode === "price"}
+              fixturesCount={displayMode === "price" ? 0 : displayMode === "next1" ? 1 : 3}
             />
             <div className="rounded-xl border border-border bg-surface-2 p-2.5">
               <div className="mb-1.5 px-1 text-[10px] font-bold uppercase tracking-wider text-text-dim">

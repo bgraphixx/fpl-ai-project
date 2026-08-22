@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { GeneratingScreen } from "@/components/GeneratingScreen";
-import { clubColor, clubTextColor } from "@/lib/club-colors";
+import { ClubBadge } from "@/components/ClubBadge";
 import type { CurrentSquad } from "@/lib/squad";
 import type { StoredPick } from "@/types/ui";
 
@@ -267,12 +267,7 @@ function PlayerPill({
 }) {
   return (
     <div className={`flex flex-1 items-center gap-2.5 ${tone === "out" ? "opacity-75" : ""}`}>
-      <div
-        className="cap flex h-8 w-8 items-center justify-center rounded-lg text-[11px] font-bold"
-        style={{ background: clubColor(club), color: clubTextColor(club) }}
-      >
-        {club}
-      </div>
+      <ClubBadge club={club} size={32} />
       <div>
         <div className="cap text-[15px] font-semibold leading-tight">{name}</div>
         <div className={`text-[11px] ${tone === "out" ? "text-danger" : "text-success"}`}>

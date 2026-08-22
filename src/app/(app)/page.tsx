@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getSquad, TeamNotLinkedError, NoActiveGameweekError, type CurrentSquad } from "@/lib/squad";
 import { PointsView } from "@/components/PointsView";
@@ -21,7 +22,8 @@ async function loadSquad(userId: string): Promise<LoadResult> {
 
 export default async function PointsPage() {
   const session = await auth();
-  const result = await loadSquad(session!.user.id);
+  if (!session?.user) redirect("/login");
+  const result = await loadSquad(session.user.id);
 
   if (result.kind === "ok") return <PointsView squad={result.squad} />;
 
