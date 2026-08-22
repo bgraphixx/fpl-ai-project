@@ -1,5 +1,5 @@
 /**
- * Branded HTML email templates for FPL AI Picker.
+ * Branded HTML email templates for Smart Gaffer.
  *
  * All templates use inline CSS (email clients strip <style> blocks) and
  * match the app's dark design tokens: bg #070a08, accent #b6ff3d, etc.
@@ -17,7 +17,7 @@ function layout(preheader: string, content: string): string {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="dark" />
-  <title>FPL AI Picker</title>
+  <title>Smart Gaffer</title>
   <!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
 </head>
 <body style="margin:0;padding:0;background-color:#070a08;font-family:'Barlow',Helvetica,Arial,sans-serif;color:#f3f7f4;-webkit-font-smoothing:antialiased;">
@@ -34,7 +34,7 @@ function layout(preheader: string, content: string): string {
               <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td style="background:#b6ff3d;width:32px;height:32px;border-radius:8px;text-align:center;vertical-align:middle;font-size:16px;font-weight:700;color:#06210a;">◈</td>
-                  <td style="padding-left:12px;font-size:18px;font-weight:700;letter-spacing:0.03em;color:#f3f7f4;">FPL AI Picker</td>
+                  <td style="padding-left:12px;font-size:18px;font-weight:700;letter-spacing:0.03em;color:#f3f7f4;">Smart Gaffer</td>
                 </tr>
               </table>
             </td>
@@ -48,7 +48,7 @@ function layout(preheader: string, content: string): string {
           <!-- Footer -->
           <tr>
             <td style="padding-top:28px;text-align:center;font-size:12px;color:#6b7c72;line-height:1.6;">
-              FPL AI Picker · AI-assisted Fantasy Premier League decisions<br/>
+              Smart Gaffer · AI-assisted Fantasy Premier League decisions<br/>
               Not affiliated with the official game<br/>
               <a href="${APP_URL}/settings" style="color:#6b7c72;text-decoration:underline;">Email preferences</a>
             </td>
@@ -84,7 +84,7 @@ export function welcomeEmail(email: string): { subject: string; html: string } {
   const content = `
     <h1 style="margin:0 0 8px;font-size:24px;font-weight:700;color:#f3f7f4;letter-spacing:0.02em;">Welcome aboard ◈</h1>
     <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#9fb0a6;">
-      Your FPL AI Picker account is live. Link your FPL Team ID and we'll pull your 15-player squad automatically — then the AI can start recommending your best XI, transfers, and full squad builds.
+      Your Smart Gaffer account is live. Link your FPL Team ID and we'll pull your 15-player squad automatically — then the AI can start recommending your best XI, transfers, and full squad builds.
     </p>
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="background-color:#0a0e0c;border:1px solid #1a231e;border-radius:10px;padding:16px 20px;width:100%;">
       <tr>
@@ -96,7 +96,7 @@ export function welcomeEmail(email: string): { subject: string; html: string } {
     ${ctaButton("Link your team →", `${APP_URL}/onboarding`)}
   `;
   return {
-    subject: "Welcome to FPL AI Picker ◈",
+    subject: "Welcome to Smart Gaffer ◈",
     html: layout(`You're in! Link your FPL team to get started.`, content),
   };
 }

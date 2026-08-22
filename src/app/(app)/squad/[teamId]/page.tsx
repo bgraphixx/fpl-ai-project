@@ -5,7 +5,7 @@ import { targetGameweek } from "@/lib/gameweek";
 import { getPublicSquad, NoActiveGameweekError, type CurrentSquad } from "@/lib/squad";
 import { RivalPointsView } from "@/components/RivalPointsView";
 import { StateScreen } from "@/components/StateScreen";
-import Link from "next/link";
+import { BackButton } from "@/components/BackButton";
 
 type LoadResult =
   | { kind: "ok"; squad: CurrentSquad }
@@ -64,12 +64,10 @@ export default async function PublicSquadPage(props: {
     return (
       <div className="space-y-4">
         <div className="flex items-center gap-4">
-          <Link
-            href="/leagues"
+          <BackButton
+            fallbackHref="/leagues"
             className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-2 text-text-muted transition-colors hover:bg-surface-3 hover:text-text"
-          >
-            ←
-          </Link>
+          />
           <div>
             <h1 className="cap text-2xl font-bold tracking-tight">Manager&apos;s Squad</h1>
             <p className="text-sm text-text-muted">Viewing Team ID: {teamId}</p>

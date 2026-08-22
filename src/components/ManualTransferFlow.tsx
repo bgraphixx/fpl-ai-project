@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { computeTransferCost, validateFullSquad } from "@/lib/fpl-rules";
 import { PitchFormation } from "@/components/PitchFormation";
+import { ViewToggle } from "@/components/ViewToggle";
 import { ClubBadge } from "@/components/ClubBadge";
 import { FixtureChips } from "@/components/FixtureChips";
 import { FixturesToggle, type FixturesToggleValue } from "@/components/FixturesToggle";
@@ -278,26 +279,7 @@ export function ManualTransferFlow({
         )}
 
         <div className="flex flex-wrap items-center justify-between gap-2.5">
-          <div className="flex gap-1 rounded-xl border border-border bg-surface-2 p-1">
-            <button
-              onClick={() => setView("pitch")}
-              className={`cap rounded-lg px-4 py-2 text-[15px] font-bold ${
-                view === "pitch" ? "bg-accent text-accent-ink" : "text-text-muted"
-              }`}
-              type="button"
-            >
-              ◈ Pitch
-            </button>
-            <button
-              onClick={() => setView("table")}
-              className={`cap rounded-lg px-4 py-2 text-[15px] font-bold ${
-                view === "table" ? "bg-accent text-accent-ink" : "text-text-muted"
-              }`}
-              type="button"
-            >
-              ▦ Table
-            </button>
-          </div>
+          <ViewToggle view={view} onChange={setView} />
           <FixturesToggle value={fixturesCount} onChange={setFixturesCount} />
         </div>
 

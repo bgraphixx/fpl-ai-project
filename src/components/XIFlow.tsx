@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, HighlightCard } from "@/components/ui/Card";
 import { GeneratingScreen } from "@/components/GeneratingScreen";
 import { PitchFormation } from "@/components/PitchFormation";
+import { ViewToggle } from "@/components/ViewToggle";
 import { SquadTable } from "@/components/SquadTable";
 import { PlayerDetailPanel, type PlayerDetail } from "@/components/PlayerDetailPanel";
 import type { CurrentSquad } from "@/lib/squad";
@@ -140,22 +141,7 @@ export function XIFlow({ squad }: { squad: CurrentSquad }) {
             {result.summary}
           </HighlightCard>
 
-          <div className="flex gap-1 rounded-xl border border-border bg-surface-2 p-1">
-            <button
-              onClick={() => setView("pitch")}
-              className={`cap flex-1 rounded-lg py-2 text-[15px] font-bold ${view === "pitch" ? "bg-accent text-accent-ink" : "text-text-muted"}`}
-              type="button"
-            >
-              ◈ Pitch
-            </button>
-            <button
-              onClick={() => setView("table")}
-              className={`cap flex-1 rounded-lg py-2 text-[15px] font-bold ${view === "table" ? "bg-accent text-accent-ink" : "text-text-muted"}`}
-              type="button"
-            >
-              ▦ Table
-            </button>
-          </div>
+          <ViewToggle view={view} onChange={setView} />
 
           {view === "pitch" ? (
             <>

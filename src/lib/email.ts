@@ -30,7 +30,7 @@ export async function sendEmail(opts: SendEmailOptions): Promise<SendEmailResult
   }
 
   const body = {
-    from: { address: senderAddress, name: "FPL AI Picker" },
+    from: { address: senderAddress, name: "Smart Gaffer" },
     to: [{ email_address: { address: opts.to.address, name: opts.to.name ?? "" } }],
     subject: opts.subject,
     htmlbody: opts.html,

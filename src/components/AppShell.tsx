@@ -23,7 +23,7 @@ export function Logo() {
       <div className="cap flex h-9 w-9 items-center justify-center rounded-[9px] bg-accent text-lg font-bold text-accent-ink">
         XI
       </div>
-      <div className="cap text-xl font-bold">FPL Genie</div>
+      <div className="cap text-xl font-bold">Smart Gaffer</div>
     </div>
   );
 }

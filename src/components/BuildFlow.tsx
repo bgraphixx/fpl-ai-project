@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { GeneratingScreen } from "@/components/GeneratingScreen";
 import { PitchFormation } from "@/components/PitchFormation";
 import { SquadTable } from "@/components/SquadTable";
+import { ViewToggle } from "@/components/ViewToggle";
 import { PlayerDetailPanel, type PlayerDetail } from "@/components/PlayerDetailPanel";
 import { DisplayModeToggle, type DisplayMode } from "@/components/DisplayModeToggle";
 import type { DisplayPlayer, StoredPick, UpcomingFixture } from "@/types/ui";
@@ -162,22 +163,7 @@ export function BuildFlow({ gameweek }: { gameweek: number }) {
             <span className="text-sm text-text-muted">£{totalValue.toFixed(1)}m</span>
           </div>
 
-          <div className="flex gap-1 rounded-xl border border-border bg-surface-2 p-1">
-            <button
-              onClick={() => setView("pitch")}
-              className={`cap flex-1 rounded-lg py-2 text-[15px] font-bold ${view === "pitch" ? "bg-accent text-accent-ink" : "text-text-muted"}`}
-              type="button"
-            >
-              ◈ Pitch
-            </button>
-            <button
-              onClick={() => setView("table")}
-              className={`cap flex-1 rounded-lg py-2 text-[15px] font-bold ${view === "table" ? "bg-accent text-accent-ink" : "text-text-muted"}`}
-              type="button"
-            >
-              ▦ Table
-            </button>
-          </div>
+          <ViewToggle view={view} onChange={setView} />
 
           <Card className="text-[13px] leading-snug text-[#cdd8d1]">{result.summary}</Card>
 

@@ -15,7 +15,7 @@ const barlowCondensed = Barlow_Condensed({
 });
 
 export const metadata: Metadata = {
-  title: "FPL AI Picker",
+  title: "Smart Gaffer",
   description: "AI-assisted Fantasy Premier League decisions for a small group of friends.",
 };
 

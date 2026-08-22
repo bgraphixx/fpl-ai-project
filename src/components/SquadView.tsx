@@ -7,6 +7,7 @@ import { SquadTable } from "@/components/SquadTable";
 import { PlayerDetailPanel, type PlayerDetail } from "@/components/PlayerDetailPanel";
 import { Countdown } from "@/components/Countdown";
 import { RefreshSquadButton } from "@/components/RefreshSquadButton";
+import { ViewToggle } from "@/components/ViewToggle";
 import { DisplayModeToggle, type DisplayMode } from "@/components/DisplayModeToggle";
 import type { DisplayPlayer } from "@/types/ui";
 import type { CurrentSquad } from "@/lib/squad";
@@ -87,26 +88,7 @@ export function SquadView({ squad, deadline }: { squad: CurrentSquad; deadline: 
           </Link>
         </div>
 
-        <div className="flex gap-1 rounded-xl border border-border bg-surface-2 p-1">
-          <button
-            onClick={() => setView("pitch")}
-            className={`cap flex-1 rounded-lg py-2 text-[15px] font-bold ${
-              view === "pitch" ? "bg-accent text-accent-ink" : "text-text-muted"
-            }`}
-            type="button"
-          >
-            ◈ Pitch
-          </button>
-          <button
-            onClick={() => setView("table")}
-            className={`cap flex-1 rounded-lg py-2 text-[15px] font-bold ${
-              view === "table" ? "bg-accent text-accent-ink" : "text-text-muted"
-            }`}
-            type="button"
-          >
-            ▦ Table
-          </button>
-        </div>
+        <ViewToggle view={view} onChange={setView} />
 
         <DisplayModeToggle mode={displayMode} onChange={setDisplayMode} />
 

@@ -1,9 +1,10 @@
-# FPL AI Picker
+# Smart Gaffer
 
 A multi-user Next.js app that uses an LLM (via OpenRouter free models) reasoning over
 live official FPL data to help a small group of friends make Fantasy Premier League
 decisions: gameweek XI + captain, transfer suggestions, and full squad builds. See
-`Reference/FPL AI Picker.dc.html` for the UI design catalog.
+`Reference/FPL AI Picker.dc.html` (original design catalog, filename predates the
+Smart Gaffer rename) for the UI design catalog.
 
 ## Stack
 
