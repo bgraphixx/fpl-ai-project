@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getBootstrapStatic, getFixtures } from "@/lib/fpl";
 import { buildPlayerSignals } from "@/lib/signals";
+import { getLiveAdjustmentMap } from "@/lib/squad";
 import { buildSwapPrompt } from "@/lib/prompts";
 import { generateNarration, recommendationErrorResponse } from "@/lib/generate-with-validation";
 
@@ -46,15 +47,16 @@ export async function POST(request: Request) {
     .slice(0, CANDIDATE_POOL_SIZE)
     .map((e) => e.id);
 
-  const [historyRecords, teamStrengths] = await Promise.all([
+  const [historyRecords, teamStrengths, liveAdjustmentMap] = await Promise.all([
     prisma.playerHistory.findMany(),
     prisma.teamStrength.findMany(),
+    getLiveAdjustmentMap(bootstrap as never),
   ]);
   const historyMap = new Map(historyRecords.map((h) => [h.id, h]));
   const teamStrengthMap = new Map(teamStrengths.map((t) => [t.id, t]));
 
-  const [outSignal] = buildPlayerSignals(bootstrap as never, fixtures as never, [outPlayerId], historyMap, teamStrengthMap);
-  const candidateSignals = buildPlayerSignals(bootstrap as never, fixtures as never, candidateIds, historyMap, teamStrengthMap)
+  const [outSignal] = buildPlayerSignals(bootstrap as never, fixtures as never, [outPlayerId], historyMap, teamStrengthMap, liveAdjustmentMap);
+  const candidateSignals = buildPlayerSignals(bootstrap as never, fixtures as never, candidateIds, historyMap, teamStrengthMap, liveAdjustmentMap)
     .filter((c) => bank + outSignal.price >= c.price)
     .sort((a, b) => b.expectedPoints - a.expectedPoints)
     .slice(0, 10);

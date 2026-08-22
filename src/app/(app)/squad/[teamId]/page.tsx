@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { getBootstrapStatic, getFixtures } from "@/lib/fpl";
 import { targetGameweek } from "@/lib/gameweek";
 import { getPublicSquad, NoActiveGameweekError, type CurrentSquad } from "@/lib/squad";
-import { SquadView } from "@/components/SquadView";
+import { RivalPointsView } from "@/components/RivalPointsView";
 import { StateScreen } from "@/components/StateScreen";
 import Link from "next/link";
 
@@ -58,7 +58,7 @@ export default async function PublicSquadPage(props: {
     );
   }
 
-  const [result, deadline] = await Promise.all([loadSquad(teamId), loadDeadline()]);
+  const [result] = await Promise.all([loadSquad(teamId), loadDeadline()]);
 
   if (result.kind === "ok") {
     return (
@@ -75,7 +75,7 @@ export default async function PublicSquadPage(props: {
             <p className="text-sm text-text-muted">Viewing Team ID: {teamId}</p>
           </div>
         </div>
-        <SquadView squad={result.squad} deadline={deadline} isPublic={true} />
+        <RivalPointsView squad={result.squad} />
       </div>
     );
   }

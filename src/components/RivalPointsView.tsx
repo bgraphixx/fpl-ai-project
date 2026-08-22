@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { ClubBadge } from "@/components/ClubBadge";
 import { PitchFormation } from "@/components/PitchFormation";
-import { RefreshSquadButton } from "@/components/RefreshSquadButton";
 import { PlayerDetailPanel, type PlayerDetail } from "@/components/PlayerDetailPanel";
 import type { CurrentSquad } from "@/lib/squad";
 import type { DisplayPlayer } from "@/types/ui";
@@ -83,23 +82,18 @@ function PlayerPointsRow({ player, onClick }: { player: DisplayPlayer; onClick: 
           {contribution}
           {multiplier > 1 && <span className="ml-1 text-xs text-text-dim">({raw} × {multiplier})</span>}
         </div>
-        {player.expectedPoints !== undefined && (
-          <div className="text-[11px] font-medium text-accent mt-0.5">
-            {player.expectedPoints.toFixed(1)} xPts
-          </div>
-        )}
       </div>
     </button>
   );
 }
 
-export function PointsView({ squad }: { squad: CurrentSquad }) {
+export function RivalPointsView({ squad }: { squad: CurrentSquad }) {
   const [view, setView] = useState<"pitch" | "table">("pitch");
   const [detail, setDetail] = useState<PlayerDetail | null>(null);
+  
   const benchPoints = squad.bench.reduce((sum, p) => sum + (p.gwPoints ?? 0), 0);
   const livePoints = squad.starting.reduce((sum, p) => sum + ((p.gwPoints ?? 0) * (p.multiplier ?? 1)), 0);
   const netLivePoints = livePoints - (squad.transferCost ?? 0);
-  const totalXp = squad.starting.reduce((sum, p) => sum + ((p.expectedPoints ?? 0) * (p.multiplier ?? 1)), 0);
 
   // Group starting XI by position for table view
   const startingGroups = POSITION_ORDER.map(({ key, label }) => ({
@@ -111,19 +105,9 @@ export function PointsView({ squad }: { squad: CurrentSquad }) {
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-8">
       <div className="flex flex-1 flex-col gap-5">
-        <div className="flex items-center justify-between">
-          <h1 className="cap text-2xl font-bold">Points</h1>
-          <RefreshSquadButton lastSyncedAt={squad.lastSyncedAt} />
-        </div>
-
         <div className="rounded-2xl border border-success-deep bg-gradient-to-br from-[#14351f] to-[#0c1c13] p-5">
-          <div className="flex items-center justify-between">
-            <div className="cap text-xs font-bold uppercase tracking-widest text-accent">
-              Gameweek {squad.pointsGameweek}
-            </div>
-            <div className="text-xs font-semibold text-accent">
-              {totalXp.toFixed(1)} Expected Pts
-            </div>
+          <div className="cap text-xs font-bold uppercase tracking-widest text-accent">
+            Gameweek {squad.pointsGameweek}
           </div>
           <div className="cap mt-1.5 flex items-end gap-3 leading-none">
             <span className="text-5xl font-bold">{netLivePoints}</span>
@@ -135,7 +119,7 @@ export function PointsView({ squad }: { squad: CurrentSquad }) {
           </div>
           {squad.points === null && (
             <p className="mt-1 text-xs text-[#cdd8d1]">
-              No live score yet — this squad hasn&apos;t been synced from FPL. Hit Refresh.
+              No live score yet — this squad hasn&apos;t been synced from FPL.
             </p>
           )}
           <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-[#cdd8d1]">
@@ -219,7 +203,7 @@ export function PointsView({ squad }: { squad: CurrentSquad }) {
                     </div>
                     <div className="px-4">
                       {group.players.map((p) => (
-                        <PlayerPointsRow key={p.id} player={p} onClick={() => setDetail(toPointsDetail(p))} />
+                         <PlayerPointsRow key={p.id} player={p} onClick={() => setDetail(toPointsDetail(p))} />
                       ))}
                     </div>
                   </div>

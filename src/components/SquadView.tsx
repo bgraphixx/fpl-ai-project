@@ -35,7 +35,7 @@ function toDetail(p: DisplayPlayer): PlayerDetail {
 
 type Deadline = { deadlineISO: string; gameweek: number; fixtureCount: number } | null;
 
-export function SquadView({ squad, deadline, isPublic = false }: { squad: CurrentSquad; deadline: Deadline; isPublic?: boolean }) {
+export function SquadView({ squad, deadline }: { squad: CurrentSquad; deadline: Deadline }) {
   const [view, setView] = useState<"pitch" | "table">("pitch");
   const [displayMode, setDisplayMode] = useState<DisplayMode>("price");
   const [detail, setDetail] = useState<PlayerDetail | null>(null);
@@ -59,11 +59,9 @@ export function SquadView({ squad, deadline, isPublic = false }: { squad: Curren
           <div className="flex flex-col items-end gap-1 text-sm text-text-muted">
             <div className="flex items-center gap-3">
               <span>£{squad.bank.toFixed(1)}m ITB</span>
-              {!isPublic && (
-                <Link href="/squad/edit" className="cap font-semibold text-accent">
-                  Edit ›
-                </Link>
-              )}
+              <Link href="/squad/edit" className="cap font-semibold text-accent">
+                Edit ›
+              </Link>
             </div>
             <div className="text-[11px] font-medium bg-surface-2 px-2 py-0.5 rounded-full text-text-muted border border-border">
               XI xPts: <span className="font-bold text-accent">{squad.starting.reduce((sum, p) => sum + (p.expectedPoints || 0), 0).toFixed(1)}</span>
@@ -72,24 +70,22 @@ export function SquadView({ squad, deadline, isPublic = false }: { squad: Curren
             </div>
           </div>
         </div>
-        {!isPublic && <RefreshSquadButton lastSyncedAt={squad.lastSyncedAt} />}
+        <RefreshSquadButton lastSyncedAt={squad.lastSyncedAt} />
 
-        {!isPublic && (
-          <div className="flex flex-col gap-2.5 sm:flex-row">
-            <Link
-              href="/xi"
-              className="cap flex flex-1 items-center justify-center gap-2 rounded-xl border border-success-deep bg-gradient-to-br from-[#123021] to-[#0f2418] px-4 py-3 text-[15px] font-bold text-accent"
-            >
-              ✨ Ask AI for my XI
-            </Link>
-            <Link
-              href="/build"
-              className="cap flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-2 px-4 py-3 text-[15px] font-bold text-text-muted"
-            >
-              Build from scratch
-            </Link>
-          </div>
-        )}
+        <div className="flex flex-col gap-2.5 sm:flex-row">
+          <Link
+            href="/xi"
+            className="cap flex flex-1 items-center justify-center gap-2 rounded-xl border border-success-deep bg-gradient-to-br from-[#123021] to-[#0f2418] px-4 py-3 text-[15px] font-bold text-accent"
+          >
+            ✨ Ask AI for my XI
+          </Link>
+          <Link
+            href="/build"
+            className="cap flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-2 px-4 py-3 text-[15px] font-bold text-text-muted"
+          >
+            Build from scratch
+          </Link>
+        </div>
 
         <div className="flex gap-1 rounded-xl border border-border bg-surface-2 p-1">
           <button

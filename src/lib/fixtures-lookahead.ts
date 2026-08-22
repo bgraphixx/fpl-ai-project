@@ -7,6 +7,7 @@ export type Fixture = {
   team_h_difficulty: number;
   team_a_difficulty: number;
   started: boolean;
+  finished: boolean;
 };
 
 // A team's next N fixtures (opponent short name + fixture difficulty rating),

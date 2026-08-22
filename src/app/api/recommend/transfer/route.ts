@@ -3,7 +3,7 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getBootstrapStatic, getFixtures } from "@/lib/fpl";
-import { getTransferCandidates } from "@/lib/squad";
+import { getTransferCandidates, getLiveAdjustmentMap } from "@/lib/squad";
 import { buildPlayerSignals } from "@/lib/signals";
 import { buildTransferPrompt } from "@/lib/prompts";
 import { computeTransferCost } from "@/lib/fpl-rules";
@@ -47,16 +47,17 @@ export async function POST(request: Request) {
   ]);
 
   const allPlayerIds = [...squadPlayerIds, ...candidatePlayerIds];
-  const [historyRecords, teamStrengths] = await Promise.all([
+  const [historyRecords, teamStrengths, liveAdjustmentMap] = await Promise.all([
     prisma.playerHistory.findMany({ where: { id: { in: allPlayerIds } } }),
-    prisma.teamStrength.findMany()
+    prisma.teamStrength.findMany(),
+    getLiveAdjustmentMap(bootstrap as never),
   ]);
-  
+
   const historyMap = new Map(historyRecords.map(h => [h.id, h]));
   const teamStrengthMap = new Map(teamStrengths.map(t => [t.id, t]));
 
-  const squadSignals = buildPlayerSignals(bootstrap as never, fixtures as never, squadPlayerIds, historyMap, teamStrengthMap);
-  const candidateSignals = buildPlayerSignals(bootstrap as never, fixtures as never, candidatePlayerIds, historyMap, teamStrengthMap);
+  const squadSignals = buildPlayerSignals(bootstrap as never, fixtures as never, squadPlayerIds, historyMap, teamStrengthMap, liveAdjustmentMap);
+  const candidateSignals = buildPlayerSignals(bootstrap as never, fixtures as never, candidatePlayerIds, historyMap, teamStrengthMap, liveAdjustmentMap);
 
   // 1. Math Solver Engine
   const solverResult = solveTransfers(squadSignals, candidateSignals, bank, freeTransfers, allowHits);

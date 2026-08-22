@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getBootstrapStatic, getEntryPicks, getEventLive, getFixtures } from "@/lib/fpl";
 import { pickableGameweek, targetGameweek } from "@/lib/gameweek";
 import { computeUpcomingFixtures, type Fixture } from "@/lib/fixtures-lookahead";
-import { attachExpectedPoints } from "@/lib/signals";
+import { attachExpectedPoints, buildLiveAdjustmentMap, type LiveElementStats } from "@/lib/signals";
 import type { DisplayPlayer, StoredPick } from "@/types/ui";
 import type { Position } from "@/types/fpl";
 import type { PlayerHistory, TeamStrength } from "@prisma/client";
@@ -62,10 +62,42 @@ type FplPicksResponse = {
 type FplLiveResponse = {
   elements: {
     id: number;
-    stats: { total_points: number };
+    stats: { total_points: number; [key: string]: number };
     explain: { stats: { identifier: string; points: number; value: number }[] }[];
   }[];
 };
+
+// A player's fixture this gameweek might still be live (started, not yet
+// finished) — bootstrap-static's season totals would already include that
+// in-progress contribution, which would let a match's still-developing
+// result leak into what's meant to be a forward-looking projection. This
+// resolves the map of "subtract this back out" adjustments (see
+// buildLiveAdjustmentMap in signals.ts) for whichever gameweek's picks are
+// being displayed right now.
+function resolveLiveAdjustment(
+  bootstrap: Bootstrap,
+  allFixtures: Fixture[],
+  pickableGwId: number | undefined,
+  live: FplLiveResponse | null,
+): Map<number, LiveElementStats> {
+  if (!pickableGwId) return new Map();
+  const currentGwFixtures = allFixtures.filter((f) => f.event === pickableGwId);
+  return buildLiveAdjustmentMap(bootstrap.elements, currentGwFixtures, live);
+}
+
+// Same as resolveLiveAdjustment, but does its own fetching — for the
+// /api/recommend/* routes, which already have `bootstrap` but (unlike the
+// squad-loading functions above) don't otherwise fetch the unscoped fixture
+// list or this gameweek's live stats.
+export async function getLiveAdjustmentMap(bootstrap: Bootstrap): Promise<Map<number, LiveElementStats>> {
+  const pickableGw = pickableGameweek(bootstrap.events);
+  if (!pickableGw) return new Map();
+  const [allFixtures, live] = await Promise.all([
+    getFixtures() as Promise<Fixture[]>,
+    getEventLive(pickableGw.id).catch(() => null) as Promise<FplLiveResponse | null>,
+  ]);
+  return resolveLiveAdjustment(bootstrap, allFixtures, pickableGw.id, live);
+}
 
 export class TeamNotLinkedError extends Error {
   constructor() {
@@ -118,6 +150,7 @@ function joinDisplaySquad(
   fixtures?: Fixture[],
   historyMap?: Map<number, PlayerHistory>,
   teamStrengthMap?: Map<number, TeamStrength>,
+  liveAdjustmentMap?: Map<number, LiveElementStats>,
 ): { starting: DisplayPlayer[]; bench: DisplayPlayer[] } {
   const teamById = new Map(bootstrap.teams.map((t) => [t.id, t.short_name]));
   const elementById = new Map(bootstrap.elements.map((e) => [e.id, e]));
@@ -132,7 +165,8 @@ function joinDisplaySquad(
 
     const rawUpcomingFixtures = fixtures ? computeUpcomingFixtures(fixtures, el.team, teamById) : [];
     const history = historyMap?.get(el.id);
-    const enrichedFixtures = attachExpectedPoints(el, position, rawUpcomingFixtures, history, teamStrengthMap ?? new Map());
+    const liveAdjustment = liveAdjustmentMap?.get(el.id);
+    const enrichedFixtures = attachExpectedPoints(el, position, rawUpcomingFixtures, history, teamStrengthMap ?? new Map(), liveAdjustment);
     const expectedPoints = enrichedFixtures[0]?.expectedPoints ?? 0;
 
     return {
@@ -191,6 +225,7 @@ export async function refreshSquadFromFpl(userId: string): Promise<CurrentSquad>
   ]);
   const historyMap = new Map(historyRecords.map(h => [h.id, h]));
   const teamStrengthMap = new Map(teamStrengths.map(t => [t.id, t]));
+  const liveAdjustmentMap = resolveLiveAdjustment(bootstrap, fixtures, pickableGw.id, live);
 
   const snapshot = await prisma.squadSnapshot.create({
     data: {
@@ -208,7 +243,7 @@ export async function refreshSquadFromFpl(userId: string): Promise<CurrentSquad>
     },
   });
 
-  const { starting, bench } = joinDisplaySquad(storedPicks, bootstrap, live, fixtures, historyMap, teamStrengthMap);
+  const { starting, bench } = joinDisplaySquad(storedPicks, bootstrap, live, fixtures, historyMap, teamStrengthMap, liveAdjustmentMap);
 
   return {
     gameweek: targetGw.id,
@@ -256,8 +291,9 @@ export async function getStoredSquad(userId: string): Promise<CurrentSquad | nul
   ]);
   const historyMap = new Map(historyRecords.map(h => [h.id, h]));
   const teamStrengthMap = new Map(teamStrengths.map(t => [t.id, t]));
+  const liveAdjustmentMap = resolveLiveAdjustment(bootstrap, fixtures, pickableGw?.id, live);
 
-  const { starting, bench } = joinDisplaySquad(storedPicks, bootstrap, live, fixtures, historyMap, teamStrengthMap);
+  const { starting, bench } = joinDisplaySquad(storedPicks, bootstrap, live, fixtures, historyMap, teamStrengthMap, liveAdjustmentMap);
 
   return {
     gameweek: targetGw?.id ?? snapshot.gameweek,
@@ -314,6 +350,7 @@ export async function getPublicSquad(fplTeamId: number): Promise<CurrentSquad> {
   ]);
   const historyMap = new Map(historyRecords.map((h) => [h.id, h]));
   const teamStrengthMap = new Map(teamStrengths.map((t) => [t.id, t]));
+  const liveAdjustmentMap = resolveLiveAdjustment(bootstrap, fixtures, pickableGw.id, live);
 
   const { starting, bench } = joinDisplaySquad(
     storedPicks,
@@ -321,7 +358,8 @@ export async function getPublicSquad(fplTeamId: number): Promise<CurrentSquad> {
     live,
     fixtures,
     historyMap,
-    teamStrengthMap
+    teamStrengthMap,
+    liveAdjustmentMap
   );
 
   return {
@@ -400,13 +438,18 @@ export async function getAllPlayers(): Promise<DisplayPlayer[]> {
     getFixtures() as Promise<Fixture[]>,
   ]);
   const teamById = new Map(bootstrap.teams.map((t) => [t.id, t.short_name]));
+  const pickableGw = pickableGameweek(bootstrap.events);
 
-  const [historyRecords, teamStrengths] = await Promise.all([
+  const [historyRecords, teamStrengths, live] = await Promise.all([
     prisma.playerHistory.findMany(),
     prisma.teamStrength.findMany(),
+    pickableGw
+      ? (getEventLive(pickableGw.id).catch(() => null) as Promise<FplLiveResponse | null>)
+      : Promise.resolve(null),
   ]);
   const historyMap = new Map(historyRecords.map((h) => [h.id, h]));
   const teamStrengthMap = new Map(teamStrengths.map((t) => [t.id, t]));
+  const liveAdjustmentMap = resolveLiveAdjustment(bootstrap, fixtures, pickableGw?.id, live);
 
   return bootstrap.elements.map((el) => {
     const chance = el.chance_of_playing_this_round;
@@ -414,7 +457,8 @@ export async function getAllPlayers(): Promise<DisplayPlayer[]> {
     const rawUpcomingFixtures = computeUpcomingFixtures(fixtures, el.team, teamById);
 
     const history = historyMap.get(el.id);
-    const upcomingFixtures = attachExpectedPoints(el, position, rawUpcomingFixtures, history, teamStrengthMap);
+    const liveAdjustment = liveAdjustmentMap.get(el.id);
+    const upcomingFixtures = attachExpectedPoints(el, position, rawUpcomingFixtures, history, teamStrengthMap, liveAdjustment);
     const expectedPoints = upcomingFixtures[0]?.expectedPoints ?? 0;
 
     return {

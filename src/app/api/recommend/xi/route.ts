@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getBootstrapStatic, getFixtures } from "@/lib/fpl";
 import { buildPlayerSignals } from "@/lib/signals";
+import { getLiveAdjustmentMap } from "@/lib/squad";
 import { buildXIPrompt } from "@/lib/prompts";
 import { toSquadPlayers } from "@/lib/recommend-helpers";
 import { formationLabel } from "@/lib/fpl-rules";
@@ -40,15 +41,16 @@ export async function POST(request: Request) {
   const { gameweek, squadPlayerIds } = parsed.data;
 
   const [bootstrap, fixtures] = await Promise.all([getBootstrapStatic(), getFixtures(gameweek)]);
-  const [historyRecords, teamStrengths] = await Promise.all([
+  const [historyRecords, teamStrengths, liveAdjustmentMap] = await Promise.all([
     prisma.playerHistory.findMany({ where: { id: { in: squadPlayerIds } } }),
-    prisma.teamStrength.findMany()
+    prisma.teamStrength.findMany(),
+    getLiveAdjustmentMap(bootstrap as never),
   ]);
-  
+
   const historyMap = new Map(historyRecords.map(h => [h.id, h]));
   const teamStrengthMap = new Map(teamStrengths.map(t => [t.id, t]));
 
-  const signals = buildPlayerSignals(bootstrap as never, fixtures as never, squadPlayerIds, historyMap, teamStrengthMap);
+  const signals = buildPlayerSignals(bootstrap as never, fixtures as never, squadPlayerIds, historyMap, teamStrengthMap, liveAdjustmentMap);
   const squadPlayers = toSquadPlayers(bootstrap as never, squadPlayerIds);
   const squadById = new Map<number, SquadPlayer>(squadPlayers.map((p) => [p.id, p]));
 

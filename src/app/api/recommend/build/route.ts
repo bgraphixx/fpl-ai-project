@@ -3,7 +3,7 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getBootstrapStatic, getFixtures } from "@/lib/fpl";
-import { getTransferCandidates } from "@/lib/squad";
+import { getTransferCandidates, getLiveAdjustmentMap } from "@/lib/squad";
 import { buildPlayerSignals } from "@/lib/signals";
 import { buildSquadPrompt } from "@/lib/prompts";
 import { toSquadPlayers } from "@/lib/recommend-helpers";
@@ -45,15 +45,16 @@ export async function POST(request: Request) {
     getTransferCandidates([]),
   ]);
 
-  const [historyRecords, teamStrengths] = await Promise.all([
+  const [historyRecords, teamStrengths, liveAdjustmentMap] = await Promise.all([
     prisma.playerHistory.findMany({ where: { id: { in: candidatePlayerIds } } }),
-    prisma.teamStrength.findMany()
+    prisma.teamStrength.findMany(),
+    getLiveAdjustmentMap(bootstrap as never),
   ]);
-  
+
   const historyMap = new Map(historyRecords.map(h => [h.id, h]));
   const teamStrengthMap = new Map(teamStrengths.map(t => [t.id, t]));
 
-  const candidateSignals = buildPlayerSignals(bootstrap as never, fixtures as never, candidatePlayerIds, historyMap, teamStrengthMap);
+  const candidateSignals = buildPlayerSignals(bootstrap as never, fixtures as never, candidatePlayerIds, historyMap, teamStrengthMap, liveAdjustmentMap);
 
   const messages = buildSquadPrompt(candidateSignals, budget);
 
