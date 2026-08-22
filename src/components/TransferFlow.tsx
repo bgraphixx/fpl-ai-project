@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { GeneratingScreen } from "@/components/GeneratingScreen";
 import { clubColor, clubTextColor } from "@/lib/club-colors";
 import type { CurrentSquad } from "@/lib/squad";
+import type { StoredPick } from "@/types/ui";
 
 type TransferResult = {
   transfersOut: number[];
@@ -70,20 +71,34 @@ export function TransferFlow({ squad }: { squad: CurrentSquad }) {
     if (!result) return;
     setApplying(true);
     try {
-      const resultingIds = allPlayers
-        .map((p) => p.id)
-        .filter((id) => !result.transfersOut.includes(id))
-        .concat(result.transfersIn);
-      const totalValue = squad.teamValue - squad.bank; // rough baseline, refined below
-      void totalValue;
+      // Each incoming player takes over the slot (starting/bench) of the
+      // outgoing player it replaced; captain/vice is dropped if that player
+      // was transferred out, same as the manual transfer flow.
+      const slotByOutId = new Map(
+        result.transfersOut.map((outId, i) => [outId, { inId: result.transfersIn[i] }]),
+      );
+      const players: StoredPick[] = allPlayers.map((p) => {
+        const replacement = slotByOutId.get(p.id);
+        const isBench = squad.bench.some((b) => b.id === p.id);
+        if (!replacement) {
+          return { id: p.id, isCaptain: p.isCaptain ?? false, isViceCaptain: p.isViceCaptain ?? false, isBench };
+        }
+        return { id: replacement.inId, isCaptain: false, isViceCaptain: false, isBench };
+      });
+
+      const incomingValue = result.transfersIn.reduce((sum, id) => sum + (incomingPlayers[id]?.price ?? 0), 0);
+      const outgoingValue = result.transfersOut.reduce((sum, id) => sum + (byId.get(id)?.price ?? 0), 0);
+      const teamValue = squad.teamValue - outgoingValue + incomingValue;
+      const bank = Math.max(0, squad.bank + outgoingValue - incomingValue);
+
       await fetch("/api/squad", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           gameweek: squad.gameweek,
-          players: resultingIds,
-          bank: squad.bank,
-          teamValue: squad.teamValue,
+          players,
+          bank,
+          teamValue,
         }),
       });
       router.push("/squad");

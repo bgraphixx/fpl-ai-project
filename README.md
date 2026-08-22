@@ -48,10 +48,16 @@ decisions: gameweek XI + captain, transfer suggestions, and full squad builds. S
 
 ## Project layout
 
-- `src/lib/fpl.ts` — FPL API proxy + DB-backed cache (bootstrap-static, fixtures cached;
-  entry picks fetched fresh every time since they reflect the user's own transfers)
-- `src/lib/openrouter.ts` — OpenRouter gateway with a model fallback chain (429/5xx on one
-  model falls through to the next)
+- `src/lib/fpl.ts` — FPL API proxy + DB-backed cache. Every non-team-specific endpoint
+  (bootstrap-static, fixtures, live gameweek stats) is cached in Postgres with a 40-minute TTL;
+  entry picks/transfers are team-specific and always fetched fresh.
+- `src/lib/cache-refresh.ts` + `src/instrumentation.ts` — proactively re-warms that shared
+  cache every 30 minutes (plus once on server startup) so requests read from Postgres instead
+  of depending on a live FPL round-trip. The 40-min TTL gives headroom over the 30-min cron, so
+  a missed cycle still serves cached data rather than falling back to a live call.
+- `src/lib/openrouter.ts` — OpenRouter gateway; races every model in the fallback chain in
+  parallel and returns whichever responds first with valid content (429/timeout/empty on one
+  doesn't block the others)
 - `src/lib/signals.ts` — builds the per-player signals (form, fixture difficulty, xGI,
   injury news, price trend, ownership) the AI reasons over
 - `src/lib/prompts.ts` — prompt builders for the three modes, asking for structured JSON output

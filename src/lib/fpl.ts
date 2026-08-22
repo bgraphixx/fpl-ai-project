@@ -1,10 +1,15 @@
 import { prisma } from "@/lib/prisma";
+import { pickableGameweek, targetGameweek } from "@/lib/gameweek";
 
 const FPL_BASE = "https://fantasy.premierleague.com/api";
 
-const BOOTSTRAP_TTL_MS = 20 * 60 * 1000;
-const FIXTURES_TTL_MS = 20 * 60 * 1000;
-const ELEMENT_SUMMARY_TTL_MS = 20 * 60 * 1000;
+// TTLs give headroom over the 30-minute background refresh (lib/cache-refresh.ts)
+// so a single missed or slow cron cycle still serves cached data instead of
+// falling back to a live FPL call mid-request.
+const BOOTSTRAP_TTL_MS = 40 * 60 * 1000;
+const FIXTURES_TTL_MS = 40 * 60 * 1000;
+const ELEMENT_SUMMARY_TTL_MS = 40 * 60 * 1000;
+const EVENT_LIVE_TTL_MS = 40 * 60 * 1000;
 
 async function fplFetch<T>(path: string): Promise<T> {
   const res = await fetch(`${FPL_BASE}${path}`, {
@@ -16,13 +21,7 @@ async function fplFetch<T>(path: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-async function cached<T>(key: string, ttlMs: number, fetcher: () => Promise<T>): Promise<T> {
-  const hit = await prisma.fplCache.findUnique({ where: { key } });
-  if (hit && hit.expiresAt > new Date()) {
-    return hit.payload as T;
-  }
-
-  const payload = await fetcher();
+async function writeCache<T>(key: string, ttlMs: number, payload: T): Promise<T> {
   const now = new Date();
   await prisma.fplCache.upsert({
     where: { key },
@@ -30,6 +29,21 @@ async function cached<T>(key: string, ttlMs: number, fetcher: () => Promise<T>):
     update: { payload: payload as object, fetchedAt: now, expiresAt: new Date(now.getTime() + ttlMs) },
   });
   return payload;
+}
+
+async function cached<T>(key: string, ttlMs: number, fetcher: () => Promise<T>): Promise<T> {
+  const hit = await prisma.fplCache.findUnique({ where: { key } });
+  if (hit && hit.expiresAt > new Date()) {
+    return hit.payload as T;
+  }
+  return writeCache(key, ttlMs, await fetcher());
+}
+
+// Bypasses the TTL check and always hits FPL, overwriting the cache — used
+// by the background refresh job (lib/cache-refresh.ts) so requests almost
+// never need to fall back to a live call.
+async function forceRefresh<T>(key: string, ttlMs: number, fetcher: () => Promise<T>): Promise<T> {
+  return writeCache(key, ttlMs, await fetcher());
 }
 
 // Full player/team/gameweek dataset. Changes slowly (prices, news) — cached.
@@ -66,6 +80,36 @@ export function getEntryTransfers(teamId: number) {
   return fplFetch(`/entry/${teamId}/transfers/`);
 }
 
+// Live per-player stats for a gameweek — not team-specific, shared across
+// every user, so it's cached and kept warm the same way as bootstrap/fixtures.
 export function getEventLive(gameweek: number) {
-  return fplFetch(`/event/${gameweek}/live/`);
+  return cached(`event-live:${gameweek}`, EVENT_LIVE_TTL_MS, () => fplFetch(`/event/${gameweek}/live/`));
+}
+
+type BootstrapEvent = { id: number; deadline_time: string; finished: boolean; is_current: boolean; is_next: boolean };
+
+// Proactively refreshes every non-team-specific FPL endpoint the app uses:
+// bootstrap-static, the full fixture list, the pickable/target gameweeks'
+// fixtures, and live stats for the pickable gameweek. Called on server
+// startup and every 30 minutes after (lib/cache-refresh.ts) so requests
+// read from Postgres instead of depending on a live FPL round-trip.
+export async function refreshSharedFplCache(): Promise<void> {
+  const bootstrap = await forceRefresh("bootstrap-static", BOOTSTRAP_TTL_MS, () => fplFetch("/bootstrap-static/"));
+  const events = (bootstrap as { events: BootstrapEvent[] }).events;
+
+  const pickableGw = pickableGameweek(events);
+  const targetGw = targetGameweek(events);
+  const gameweeksToWarm = new Set([pickableGw?.id, targetGw?.id].filter((id): id is number => id != null));
+
+  await Promise.all([
+    forceRefresh("fixtures:all", FIXTURES_TTL_MS, () => fplFetch("/fixtures/")),
+    ...[...gameweeksToWarm].map((gw) =>
+      forceRefresh(`fixtures:${gw}`, FIXTURES_TTL_MS, () => fplFetch(`/fixtures/?event=${gw}`)),
+    ),
+    pickableGw
+      ? forceRefresh(`event-live:${pickableGw.id}`, EVENT_LIVE_TTL_MS, () =>
+          fplFetch(`/event/${pickableGw.id}/live/`),
+        )
+      : Promise.resolve(),
+  ]);
 }

@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { clubColor, clubTextColor } from "@/lib/club-colors";
 import { Button } from "@/components/ui/Button";
-import type { DisplayPlayer } from "@/types/ui";
+import type { DisplayPlayer, StoredPick } from "@/types/ui";
 
 const BUDGET = 100.0;
 
@@ -47,12 +47,20 @@ export function SquadEditor({
   async function save() {
     setSaving(true);
     try {
+      // First 11 are the starting XI, last 4 are bench — preserved from the
+      // starting/bench split the squad was loaded with (plan §6).
+      const players: StoredPick[] = squad.map((p, i) => ({
+        id: p.id,
+        isCaptain: p.isCaptain ?? false,
+        isViceCaptain: p.isViceCaptain ?? false,
+        isBench: i >= 11,
+      }));
       await fetch("/api/squad", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           gameweek,
-          players: squad,
+          players,
           bank: Math.max(0, BUDGET - totalValue),
           teamValue: totalValue,
         }),

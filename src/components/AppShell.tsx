@@ -5,9 +5,10 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
 const NAV_ITEMS = [
-  { href: "/", label: "Picks", icon: "◈" },
-  { href: "/squad", label: "Squad", icon: "▦" },
+  { href: "/", label: "Points", icon: "●" },
+  { href: "/squad", label: "Pick Team", icon: "▦" },
   { href: "/transfers", label: "Transfers", icon: "⇄" },
+  { href: "/fixtures", label: "Fixtures", icon: "▤" },
   { href: "/settings", label: "Settings", icon: "⚙" },
 ];
 

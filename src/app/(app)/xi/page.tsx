@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import { getCurrentSquad, TeamNotLinkedError, NoActiveGameweekError, type CurrentSquad } from "@/lib/squad";
+import { getSquad, TeamNotLinkedError, NoActiveGameweekError, type CurrentSquad } from "@/lib/squad";
 import { XIFlow } from "@/components/XIFlow";
 import { StateScreen } from "@/components/StateScreen";
 
@@ -12,7 +12,7 @@ type LoadResult =
 
 async function loadSquad(userId: string): Promise<LoadResult> {
   try {
-    return { kind: "ok", squad: await getCurrentSquad(userId) };
+    return { kind: "ok", squad: await getSquad(userId) };
   } catch (err) {
     if (err instanceof TeamNotLinkedError) return { kind: "not-linked" };
     if (err instanceof NoActiveGameweekError) return { kind: "no-gameweek" };

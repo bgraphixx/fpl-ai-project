@@ -3,6 +3,9 @@
 // ownership. Field names are FPL's as of the 2025/26 season — reconfirm
 // against a live /bootstrap-static/ pull if these stop matching (plan §10).
 
+import { computeUpcomingFixtures, type Fixture } from "@/lib/fixtures-lookahead";
+import type { UpcomingFixture } from "@/types/ui";
+
 type BootstrapElement = {
   id: number;
   web_name: string;
@@ -27,14 +30,6 @@ type Bootstrap = {
   teams: BootstrapTeam[];
 };
 
-type Fixture = {
-  event: number | null;
-  team_h: number;
-  team_a: number;
-  team_h_difficulty: number;
-  team_a_difficulty: number;
-};
-
 const POSITION_MAP: Record<number, string> = { 1: "GK", 2: "DEF", 3: "MID", 4: "FWD" };
 
 export type PlayerSignal = {
@@ -50,7 +45,7 @@ export type PlayerSignal = {
   news: string;
   expectedGoalInvolvements: number;
   priceChangeDirection: "rising" | "falling" | "stable";
-  upcomingFixtures: { opponent: string; difficulty: number; isHome: boolean }[];
+  upcomingFixtures: UpcomingFixture[];
 };
 
 export function buildPlayerSignals(
@@ -66,18 +61,7 @@ export function buildPlayerSignals(
     const el = elementById.get(id);
     if (!el) throw new Error(`Unknown player id ${id}`);
 
-    const upcomingFixtures = fixtures
-      .filter((f) => f.event !== null && (f.team_h === el.team || f.team_a === el.team))
-      .slice(0, lookaheadGameweeks)
-      .map((f) => {
-        const isHome = f.team_h === el.team;
-        const opponentTeamId = isHome ? f.team_a : f.team_h;
-        return {
-          opponent: teamById.get(opponentTeamId) ?? "UNK",
-          difficulty: isHome ? f.team_h_difficulty : f.team_a_difficulty,
-          isHome,
-        };
-      });
+    const upcomingFixtures = computeUpcomingFixtures(fixtures, el.team, teamById, lookaheadGameweeks);
 
     return {
       id: el.id,

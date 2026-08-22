@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, HighlightCard } from "@/components/ui/Card";
 import { GeneratingScreen } from "@/components/GeneratingScreen";
 import { PitchFormation } from "@/components/PitchFormation";
+import { SquadTable } from "@/components/SquadTable";
 import { PlayerDetailPanel, type PlayerDetail } from "@/components/PlayerDetailPanel";
 import type { CurrentSquad } from "@/lib/squad";
 import type { DisplayPlayer } from "@/types/ui";
@@ -29,6 +30,7 @@ export function XIFlow({ squad }: { squad: CurrentSquad }) {
   const [selfCorrected, setSelfCorrected] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [detail, setDetail] = useState<PlayerDetail | null>(null);
+  const [view, setView] = useState<"pitch" | "table">("pitch");
 
   const allPlayers = [...squad.starting, ...squad.bench];
   const byId = new Map(allPlayers.map((p) => [p.id, p]));
@@ -92,6 +94,7 @@ export function XIFlow({ squad }: { squad: CurrentSquad }) {
         isViceCaptain: p.id === result.viceCaptainId,
       }));
     const benchPlayers = result.bench.map((id) => byId.get(id)).filter(Boolean) as DisplayPlayer[];
+    const allXIPlayers = [...startingXIPlayers, ...benchPlayers];
     const reasoningById = new Map(result.perPlayer.map((p) => [p.id, p]));
 
     function openDetail(p: DisplayPlayer) {
@@ -137,26 +140,49 @@ export function XIFlow({ squad }: { squad: CurrentSquad }) {
             {result.summary}
           </HighlightCard>
 
-          <PitchFormation players={startingXIPlayers} onSelectPlayer={openDetail} />
-
-          <div>
-            <div className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-text-dim">
-              Bench (in order)
-            </div>
-            <div className="flex gap-2">
-              {benchPlayers.map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => openDetail(p)}
-                  className="flex-1 rounded-lg border border-border bg-surface-2 p-2 text-center"
-                  type="button"
-                >
-                  <div className="cap truncate text-xs font-semibold">{p.name}</div>
-                  <div className="text-[10px] text-text-dim">{p.position}</div>
-                </button>
-              ))}
-            </div>
+          <div className="flex gap-1 rounded-xl border border-border bg-surface-2 p-1">
+            <button
+              onClick={() => setView("pitch")}
+              className={`cap flex-1 rounded-lg py-2 text-[15px] font-bold ${view === "pitch" ? "bg-accent text-accent-ink" : "text-text-muted"}`}
+              type="button"
+            >
+              ◈ Pitch
+            </button>
+            <button
+              onClick={() => setView("table")}
+              className={`cap flex-1 rounded-lg py-2 text-[15px] font-bold ${view === "table" ? "bg-accent text-accent-ink" : "text-text-muted"}`}
+              type="button"
+            >
+              ▦ Table
+            </button>
           </div>
+
+          {view === "pitch" ? (
+            <>
+              <PitchFormation players={startingXIPlayers} onSelectPlayer={openDetail} />
+
+              <div>
+                <div className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-text-dim">
+                  Bench (in order)
+                </div>
+                <div className="flex gap-2">
+                  {benchPlayers.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => openDetail(p)}
+                      className="flex-1 rounded-lg border border-border bg-surface-2 p-2 text-center"
+                      type="button"
+                    >
+                      <div className="cap truncate text-xs font-semibold">{p.name}</div>
+                      <div className="text-[10px] text-text-dim">{p.position}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          ) : (
+            <SquadTable players={allXIPlayers} onSelectPlayer={openDetail} />
+          )}
 
           <button onClick={generate} className="cap text-sm font-semibold text-text-muted" type="button">
             Regenerate

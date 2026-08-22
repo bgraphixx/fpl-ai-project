@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
-import { getBootstrapStatic, getEntryPicks } from "@/lib/fpl";
-import { currentGameweek } from "@/lib/gameweek";
-import type { DisplayPlayer } from "@/types/ui";
+import { getBootstrapStatic, getEntryPicks, getEventLive, getFixtures } from "@/lib/fpl";
+import { pickableGameweek, targetGameweek } from "@/lib/gameweek";
+import { computeUpcomingFixtures, type Fixture } from "@/lib/fixtures-lookahead";
+import type { DisplayPlayer, StoredPick } from "@/types/ui";
 import type { Position } from "@/types/fpl";
 
 const POSITION_MAP: Record<number, Position> = { 1: "GK", 2: "DEF", 3: "MID", 4: "FWD" };
@@ -32,9 +33,23 @@ type FplPick = {
   multiplier: number;
 };
 
+type FplEntryHistory = {
+  bank: number;
+  value: number;
+  points: number;
+  total_points: number;
+  rank: number | null;
+  points_on_bench: number;
+  event_transfers_cost: number;
+};
+
 type FplPicksResponse = {
   picks: FplPick[];
-  entry_history: { bank: number; value: number };
+  entry_history: FplEntryHistory;
+};
+
+type FplLiveResponse = {
+  elements: { id: number; stats: { total_points: number } }[];
 };
 
 export class TeamNotLinkedError extends Error {
@@ -49,44 +64,48 @@ export class NoActiveGameweekError extends Error {
   }
 }
 
+export class NoStoredSquadError extends Error {
+  constructor() {
+    super("No squad stored yet");
+  }
+}
+
 export type CurrentSquad = {
+  // The gameweek recommendations should target (next actionable deadline).
   gameweek: number;
   bank: number;
   teamValue: number;
   starting: DisplayPlayer[];
   bench: DisplayPlayer[];
-  source: "auto";
+  source: "auto" | "manual";
+  lastSyncedAt: Date;
+  // Live gameweek scoring, for the Points page — for `pointsGameweek` (the
+  // last gameweek FPL has actually published), which is usually a different
+  // gameweek than `gameweek` above. Null for a manually-built squad, which
+  // has no real FPL score.
+  pointsGameweek: number;
+  points: number | null;
+  totalPoints: number | null;
+  rank: number | null;
+  pointsOnBench: number | null;
+  transferCost: number | null;
 };
 
-// Auto-pulls the user's current-gameweek squad from FPL, joins it with
-// bootstrap-static for display data, and stores a snapshot (plan §6).
-export async function getCurrentSquad(userId: string): Promise<CurrentSquad> {
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user?.fplTeamId) throw new TeamNotLinkedError();
-
-  const bootstrap = (await getBootstrapStatic()) as Bootstrap;
-  const gw = currentGameweek(bootstrap.events);
-  if (!gw) throw new NoActiveGameweekError();
-
-  const picks = (await getEntryPicks(user.fplTeamId, gw.id)) as FplPicksResponse;
-
-  await prisma.squadSnapshot.create({
-    data: {
-      userId: user.id,
-      gameweek: gw.id,
-      players: picks.picks as never,
-      bank: picks.entry_history.bank / 10,
-      teamValue: picks.entry_history.value / 10,
-      source: "auto",
-    },
-  });
-
+// Joins a stored (or freshly-pulled) pick list against current bootstrap +
+// live-points data, so prices/injury-status/points are always up to date
+// even when the squad composition itself is read from a stale snapshot.
+function joinDisplaySquad(
+  picks: StoredPick[],
+  bootstrap: Bootstrap,
+  live: FplLiveResponse | null,
+): { starting: DisplayPlayer[]; bench: DisplayPlayer[] } {
   const teamById = new Map(bootstrap.teams.map((t) => [t.id, t.short_name]));
   const elementById = new Map(bootstrap.elements.map((e) => [e.id, e]));
+  const livePointsById = new Map((live?.elements ?? []).map((e) => [e.id, e.stats.total_points]));
 
-  const toDisplay = (pick: FplPick): DisplayPlayer => {
-    const el = elementById.get(pick.element);
-    if (!el) throw new Error(`Unknown player id ${pick.element}`);
+  const toDisplay = (pick: StoredPick): DisplayPlayer | null => {
+    const el = elementById.get(pick.id);
+    if (!el) return null; // player no longer exists in bootstrap (rare)
     const chance = el.chance_of_playing_this_round;
     return {
       id: el.id,
@@ -95,32 +114,157 @@ export async function getCurrentSquad(userId: string): Promise<CurrentSquad> {
       position: POSITION_MAP[el.element_type] ?? "MID",
       price: el.now_cost / 10,
       form: Number(el.form) || 0,
+      points: el.total_points,
       ownership: Number(el.selected_by_percent) || 0,
       availability: chance === null || chance >= 75 ? "available" : chance >= 25 ? "doubtful" : "unavailable",
-      isCaptain: pick.is_captain,
-      isViceCaptain: pick.is_vice_captain,
+      isCaptain: pick.isCaptain,
+      isViceCaptain: pick.isViceCaptain,
+      gwPoints: livePointsById.get(pick.id),
+      multiplier: pick.isCaptain ? 2 : 1,
     };
   };
 
-  const starting = picks.picks.filter((p) => p.multiplier > 0).map(toDisplay);
-  const bench = picks.picks.filter((p) => p.multiplier === 0).map(toDisplay);
+  const starting = picks.filter((p) => !p.isBench).map(toDisplay).filter((p): p is DisplayPlayer => p !== null);
+  const bench = picks.filter((p) => p.isBench).map(toDisplay).filter((p): p is DisplayPlayer => p !== null);
+  return { starting, bench };
+}
+
+// Live-pulls the user's squad from FPL, joins it for display, and stores a
+// snapshot. This is the "Refresh" action — the only path that talks to FPL
+// for team-specific data; everything else reads the stored snapshot.
+export async function refreshSquadFromFpl(userId: string): Promise<CurrentSquad> {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user?.fplTeamId) throw new TeamNotLinkedError();
+
+  const bootstrap = (await getBootstrapStatic()) as Bootstrap;
+  const pickableGw = pickableGameweek(bootstrap.events);
+  if (!pickableGw) throw new NoActiveGameweekError();
+  const targetGw = targetGameweek(bootstrap.events) ?? pickableGw;
+
+  const [picks, live] = await Promise.all([
+    getEntryPicks(user.fplTeamId, pickableGw.id) as Promise<FplPicksResponse>,
+    getEventLive(pickableGw.id).catch(() => null) as Promise<FplLiveResponse | null>,
+  ]);
+
+  const storedPicks: StoredPick[] = picks.picks.map((p) => ({
+    id: p.element,
+    isCaptain: p.is_captain,
+    isViceCaptain: p.is_vice_captain,
+    isBench: p.multiplier === 0,
+  }));
+
+  const snapshot = await prisma.squadSnapshot.create({
+    data: {
+      userId: user.id,
+      gameweek: pickableGw.id,
+      players: storedPicks as never,
+      bank: picks.entry_history.bank / 10,
+      teamValue: picks.entry_history.value / 10,
+      source: "auto",
+      points: picks.entry_history.points,
+      totalPoints: picks.entry_history.total_points,
+      rank: picks.entry_history.rank,
+      pointsOnBench: picks.entry_history.points_on_bench,
+      transferCost: picks.entry_history.event_transfers_cost,
+    },
+  });
+
+  const { starting, bench } = joinDisplaySquad(storedPicks, bootstrap, live);
 
   return {
-    gameweek: gw.id,
+    gameweek: targetGw.id,
     bank: picks.entry_history.bank / 10,
     teamValue: picks.entry_history.value / 10,
     starting,
     bench,
     source: "auto",
+    lastSyncedAt: snapshot.createdAt,
+    pointsGameweek: pickableGw.id,
+    points: picks.entry_history.points,
+    totalPoints: picks.entry_history.total_points,
+    rank: picks.entry_history.rank,
+    pointsOnBench: picks.entry_history.points_on_bench,
+    transferCost: picks.entry_history.event_transfers_cost,
   };
 }
 
+// Reads the most recent stored snapshot (auto or manual — a manual edit
+// becomes the squad shown everywhere until the next Refresh) and re-joins
+// it against current bootstrap/live data. No live FPL call for team-specific
+// data — this is the fast path every page load uses.
+export async function getStoredSquad(userId: string): Promise<CurrentSquad | null> {
+  const snapshot = await prisma.squadSnapshot.findFirst({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+  });
+  if (!snapshot) return null;
+
+  const bootstrap = (await getBootstrapStatic()) as Bootstrap;
+  const pickableGw = pickableGameweek(bootstrap.events);
+  const targetGw = targetGameweek(bootstrap.events) ?? pickableGw;
+  const live = pickableGw
+    ? ((await getEventLive(pickableGw.id).catch(() => null)) as FplLiveResponse | null)
+    : null;
+
+  const storedPicks = snapshot.players as unknown as StoredPick[];
+  const { starting, bench } = joinDisplaySquad(storedPicks, bootstrap, live);
+
+  return {
+    gameweek: targetGw?.id ?? snapshot.gameweek,
+    bank: Number(snapshot.bank),
+    teamValue: Number(snapshot.teamValue),
+    starting,
+    bench,
+    source: snapshot.source,
+    lastSyncedAt: snapshot.createdAt,
+    pointsGameweek: pickableGw?.id ?? snapshot.gameweek,
+    points: snapshot.points,
+    totalPoints: snapshot.totalPoints,
+    rank: snapshot.rank,
+    pointsOnBench: snapshot.pointsOnBench,
+    transferCost: snapshot.transferCost,
+  };
+}
+
+// Stored squad if one exists, else seeds it with a live pull (first-ever
+// visit for a newly-linked team).
+export async function getSquad(userId: string): Promise<CurrentSquad> {
+  const stored = await getStoredSquad(userId);
+  if (stored) return stored;
+  return refreshSquadFromFpl(userId);
+}
+
+// Persists a manually-edited squad (from the squad editor or a manual
+// transfer) as the new latest snapshot — it becomes what every page shows
+// until the user hits Refresh. Has no real FPL score, so points/rank etc.
+// are left null.
+export async function saveManualSquad(
+  userId: string,
+  gameweek: number,
+  players: StoredPick[],
+  bank: number,
+  teamValue: number,
+) {
+  return prisma.squadSnapshot.create({
+    data: {
+      userId,
+      gameweek,
+      players: players as never,
+      bank,
+      teamValue,
+      source: "manual",
+    },
+  });
+}
+
 // Top players by total points per position, excluding ones already owned.
-// Keeps the AI prompt's candidate pool to a sane size instead of sending the
-// full ~600-player database (which would blow the context window).
+// Keeps the AI prompt's candidate pool to a sane size — free-tier models
+// get noticeably less reliable (more timeouts, truncated JSON) as the
+// candidate list grows, so this is deliberately tight rather than just
+// "small enough to fit the context window".
 export async function getTransferCandidates(
   excludePlayerIds: number[],
-  perPosition = 10,
+  perPosition = 6,
 ): Promise<number[]> {
   const bootstrap = (await getBootstrapStatic()) as Bootstrap;
   const excluded = new Set(excludePlayerIds);
@@ -141,9 +285,13 @@ export async function getTransferCandidates(
   return candidates;
 }
 
-// Every player in the game, for the squad-edit search sheet.
+// Every player in the game, with upcoming fixtures — for the squad-edit and
+// manual-transfer search sheets.
 export async function getAllPlayers(): Promise<DisplayPlayer[]> {
-  const bootstrap = (await getBootstrapStatic()) as Bootstrap;
+  const [bootstrap, fixtures] = await Promise.all([
+    getBootstrapStatic() as Promise<Bootstrap>,
+    getFixtures() as Promise<Fixture[]>,
+  ]);
   const teamById = new Map(bootstrap.teams.map((t) => [t.id, t.short_name]));
 
   return bootstrap.elements.map((el) => {
@@ -155,9 +303,11 @@ export async function getAllPlayers(): Promise<DisplayPlayer[]> {
       position: POSITION_MAP[el.element_type] ?? "MID",
       price: el.now_cost / 10,
       form: Number(el.form) || 0,
+      points: el.total_points,
       ownership: Number(el.selected_by_percent) || 0,
       availability:
         chance === null || chance >= 75 ? "available" : chance >= 25 ? "doubtful" : "unavailable",
+      upcomingFixtures: computeUpcomingFixtures(fixtures, el.team, teamById),
     };
   });
 }

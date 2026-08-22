@@ -28,7 +28,8 @@ export async function generateWithValidation<T>(
     let parsed: T;
     try {
       parsed = parseAIJson<T>(content);
-    } catch {
+    } catch (err) {
+      console.log(`generateWithValidation: ${modelUsed} returned invalid JSON on attempt ${attempt}:`, err instanceof Error ? err.message : err, "content:", content.slice(0, 500));
       currentMessages = [
         ...currentMessages,
         { role: "assistant", content },
@@ -41,6 +42,8 @@ export async function generateWithValidation<T>(
     if (validation.valid) {
       return { result: parsed, modelUsed, selfCorrected: attempt > 0 };
     }
+
+    console.log(`generateWithValidation: ${modelUsed} failed rule validation on attempt ${attempt}:`, validation.errors);
 
     if (attempt === 0) {
       currentMessages = [
@@ -70,7 +73,10 @@ export function recommendationErrorResponse(err: unknown): NextResponse {
   }
   if (err instanceof AllModelsFailedError) {
     return NextResponse.json(
-      { error: "All AI models are currently busy or rate-limited. Please try again shortly." },
+      {
+        error: "All AI models are currently busy or rate-limited. Please try again shortly.",
+        attempts: err.attempts,
+      },
       { status: 503 },
     );
   }

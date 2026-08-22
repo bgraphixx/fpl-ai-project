@@ -1,4 +1,6 @@
+import Image from "next/image";
 import { clubColor, clubTextColor } from "@/lib/club-colors";
+import { clubLogoSrc } from "@/lib/club-logos";
 import type { DisplayPlayer } from "@/types/ui";
 
 const AVAILABILITY_DOT: Record<NonNullable<DisplayPlayer["availability"]>, string> = {
@@ -7,8 +9,8 @@ const AVAILABILITY_DOT: Record<NonNullable<DisplayPlayer["availability"]>, strin
   unavailable: "text-danger",
 };
 
-// Player badge for the pitch view: club-colored square, name + price underneath,
-// optional captain/vice-captain armband badge.
+// Player badge for the pitch view: club-colored square with crest SVG,
+// name + price underneath, optional captain/vice-captain armband badge.
 export function PlayerChip({
   player,
   onClick,
@@ -18,6 +20,7 @@ export function PlayerChip({
 }) {
   const bg = clubColor(player.club);
   const fg = clubTextColor(player.club);
+  const logoSrc = clubLogoSrc(player.club);
 
   return (
     <button
@@ -40,7 +43,18 @@ export function PlayerChip({
           className="cap flex h-10 w-10 items-center justify-center rounded-[9px] text-[13px] font-bold shadow-lg sm:h-11 sm:w-11"
           style={{ background: bg, color: fg }}
         >
-          {player.club}
+          {logoSrc ? (
+            <Image
+              src={logoSrc}
+              alt={player.club}
+              width={28}
+              height={28}
+              className="object-contain drop-shadow-sm sm:h-[30px] sm:w-[30px]"
+              unoptimized
+            />
+          ) : (
+            player.club
+          )}
         </div>
       </div>
       <div className="min-w-[62px] rounded-md bg-surface/90 px-1.5 py-0.5 text-center">

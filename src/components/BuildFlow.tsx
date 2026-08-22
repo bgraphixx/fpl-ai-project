@@ -8,7 +8,7 @@ import { GeneratingScreen } from "@/components/GeneratingScreen";
 import { PitchFormation } from "@/components/PitchFormation";
 import { SquadTable } from "@/components/SquadTable";
 import { PlayerDetailPanel, type PlayerDetail } from "@/components/PlayerDetailPanel";
-import type { DisplayPlayer } from "@/types/ui";
+import type { DisplayPlayer, StoredPick } from "@/types/ui";
 import type { Position } from "@/types/fpl";
 
 type BuildResult = {
@@ -32,7 +32,7 @@ export function BuildFlow({ gameweek }: { gameweek: number }) {
   const [budget, setBudget] = useState(100.0);
   const [result, setResult] = useState<BuildResult | null>(null);
   const [players, setPlayers] = useState<Record<number, PlayerInfo>>({});
-  const [view, setView] = useState<"pitch" | "table">("table");
+  const [view, setView] = useState<"pitch" | "table">("pitch");
   const [error, setError] = useState<string | null>(null);
   const [detail, setDetail] = useState<PlayerDetail | null>(null);
   const [saving, setSaving] = useState(false);
@@ -65,12 +65,18 @@ export function BuildFlow({ gameweek }: { gameweek: number }) {
     setSaving(true);
     try {
       const totalValue = result.squad.reduce((sum, id) => sum + (players[id]?.price ?? 0), 0);
+      const storedPicks: StoredPick[] = result.squad.map((id) => ({
+        id,
+        isCaptain: id === result.captainId,
+        isViceCaptain: id === result.viceCaptainId,
+        isBench: !result.startingXI.includes(id),
+      }));
       await fetch("/api/squad", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           gameweek,
-          players: result.squad,
+          players: storedPicks,
           bank: Math.max(0, budget - totalValue),
           teamValue: totalValue,
         }),

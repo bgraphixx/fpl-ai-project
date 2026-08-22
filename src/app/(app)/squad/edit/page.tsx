@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import {
-  getCurrentSquad,
+  getSquad,
   getAllPlayers,
   TeamNotLinkedError,
   NoActiveGameweekError,
@@ -18,7 +18,7 @@ type LoadResult =
 
 async function loadData(userId: string): Promise<LoadResult> {
   try {
-    const [squad, allPlayers] = await Promise.all([getCurrentSquad(userId), getAllPlayers()]);
+    const [squad, allPlayers] = await Promise.all([getSquad(userId), getAllPlayers()]);
     return { kind: "ok", squad, allPlayers };
   } catch (err) {
     if (err instanceof TeamNotLinkedError || err instanceof NoActiveGameweekError) {

@@ -40,9 +40,18 @@ model SquadSnapshot {
   source     SquadSource
   createdAt  DateTime    @default(now())
 
+  // Live scoring as of this snapshot (only populated for source "auto" —
+  // manual edits don't have real FPL-scored points). Null until refreshed.
+  points        Int?
+  totalPoints   Int?
+  rank          Int?
+  pointsOnBench Int?
+  transferCost  Int?
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, gameweek])
+  @@index([userId, createdAt])
 }
 
 model Recommendation {

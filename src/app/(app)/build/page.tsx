@@ -1,5 +1,5 @@
 import { getBootstrapStatic } from "@/lib/fpl";
-import { currentGameweek } from "@/lib/gameweek";
+import { targetGameweek } from "@/lib/gameweek";
 import { BuildFlow } from "@/components/BuildFlow";
 import { StateScreen } from "@/components/StateScreen";
 
@@ -10,7 +10,7 @@ type BootstrapStatic = {
 async function loadGameweek(): Promise<number | null> {
   try {
     const bootstrap = (await getBootstrapStatic()) as BootstrapStatic;
-    return currentGameweek(bootstrap.events)?.id ?? null;
+    return targetGameweek(bootstrap.events)?.id ?? null;
   } catch {
     return null;
   }

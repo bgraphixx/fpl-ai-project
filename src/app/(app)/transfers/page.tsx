@@ -1,18 +1,25 @@
-import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import { getCurrentSquad, TeamNotLinkedError, NoActiveGameweekError, type CurrentSquad } from "@/lib/squad";
-import { TransferFlow } from "@/components/TransferFlow";
+import {
+  getSquad,
+  getAllPlayers,
+  TeamNotLinkedError,
+  NoActiveGameweekError,
+  type CurrentSquad,
+} from "@/lib/squad";
+import { TransfersContainer } from "@/components/TransfersContainer";
 import { StateScreen } from "@/components/StateScreen";
+import type { DisplayPlayer } from "@/types/ui";
 
 type LoadResult =
-  | { kind: "ok"; squad: CurrentSquad }
+  | { kind: "ok"; squad: CurrentSquad; allPlayers: DisplayPlayer[] }
   | { kind: "not-linked" }
   | { kind: "no-gameweek" }
   | { kind: "unreachable" };
 
-async function loadSquad(userId: string): Promise<LoadResult> {
+async function loadData(userId: string): Promise<LoadResult> {
   try {
-    return { kind: "ok", squad: await getCurrentSquad(userId) };
+    const [squad, allPlayers] = await Promise.all([getSquad(userId), getAllPlayers()]);
+    return { kind: "ok", squad, allPlayers };
   } catch (err) {
     if (err instanceof TeamNotLinkedError) return { kind: "not-linked" };
     if (err instanceof NoActiveGameweekError) return { kind: "no-gameweek" };
@@ -22,17 +29,18 @@ async function loadSquad(userId: string): Promise<LoadResult> {
 
 export default async function TransfersPage() {
   const session = await auth();
-  if (!session?.user) redirect("/login");
-  const result = await loadSquad(session.user.id);
+  const result = await loadData(session!.user.id);
 
-  if (result.kind === "ok") return <TransferFlow squad={result.squad} />;
+  if (result.kind === "ok") {
+    return <TransfersContainer squad={result.squad} allPlayers={result.allPlayers} />;
+  }
 
   if (result.kind === "not-linked") {
     return (
       <StateScreen
         icon="🔗"
         title="No team linked yet"
-        message="Link your FPL Team ID so the AI can suggest transfers for your real squad."
+        message="Link your FPL Team ID to manage transfers for your real squad."
         action="Link FPL Team ID"
         actionHref="/onboarding"
       />
