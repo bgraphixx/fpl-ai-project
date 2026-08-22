@@ -30,8 +30,8 @@ services:
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       OPENROUTER_MODELS: ${OPENROUTER_MODELS:-}
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
 
 volumes:
   postgres_data:
