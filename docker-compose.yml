@@ -16,14 +16,26 @@ services:
       timeout: 5s
       retries: 10
 
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: migrator
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://fpl:fpl@postgres:5432/fpl_ai_picker
+
   app:
     build:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
     depends_on:
-      postgres:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     environment:
       DATABASE_URL: postgresql://fpl:fpl@postgres:5432/fpl_ai_picker
       NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
