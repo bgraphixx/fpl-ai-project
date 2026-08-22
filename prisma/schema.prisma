@@ -76,3 +76,25 @@ model FplCache {
   fetchedAt DateTime @default(now())
   expiresAt DateTime
 }
+
+model PlayerHistory {
+  id                    Int      @id // FPL element ID
+  pastSeasonMinutes     Int
+  pastSeasonStarts      Int
+  pastSeasonXG          Decimal  @db.Decimal(5, 2)
+  pastSeasonXA          Decimal  @db.Decimal(5, 2)
+  pastSeasonXGC         Decimal  @db.Decimal(5, 2)
+  pastSeasonXGI         Decimal  @db.Decimal(5, 2)
+  pastSeasonSaves       Int
+  pastSeasonBPS         Int
+  syncedAt              DateTime @default(now())
+}
+
+model TeamStrength {
+  id                    Int      @id // FPL team ID
+  strengthAttackHome    Int
+  strengthAttackAway    Int
+  strengthDefenseHome   Int
+  strengthDefenseAway   Int
+  syncedAt              DateTime @default(now())
+}

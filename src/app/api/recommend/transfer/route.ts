@@ -6,11 +6,11 @@ import { getBootstrapStatic, getFixtures } from "@/lib/fpl";
 import { getTransferCandidates } from "@/lib/squad";
 import { buildPlayerSignals } from "@/lib/signals";
 import { buildTransferPrompt } from "@/lib/prompts";
-import { toSquadPlayers } from "@/lib/recommend-helpers";
-import { validateTransfer, computeTransferCost } from "@/lib/fpl-rules";
-import { generateWithValidation, recommendationErrorResponse } from "@/lib/generate-with-validation";
+import { computeTransferCost } from "@/lib/fpl-rules";
+import { generateNarration, recommendationErrorResponse } from "@/lib/generate-with-validation";
 import { sendEmail } from "@/lib/email";
 import { transferRecommendationEmail } from "@/lib/email-templates";
+import { solveTransfers } from "@/lib/solver-models";
 
 const requestSchema = z.object({
   gameweek: z.number().int().positive(),
@@ -45,36 +45,46 @@ export async function POST(request: Request) {
     getFixtures(gameweek),
     getTransferCandidates(squadPlayerIds),
   ]);
-  const squadSignals = buildPlayerSignals(bootstrap as never, fixtures as never, squadPlayerIds);
-  const candidateSignals = buildPlayerSignals(bootstrap as never, fixtures as never, candidatePlayerIds);
-  const squadPlayers = toSquadPlayers(bootstrap as never, squadPlayerIds);
-  const previousSquadValue = squadPlayers.reduce((sum, p) => sum + p.price, 0);
 
-  const messages = buildTransferPrompt(squadSignals, candidateSignals, freeTransfers, bank, allowHits);
+  const allPlayerIds = [...squadPlayerIds, ...candidatePlayerIds];
+  const [historyRecords, teamStrengths] = await Promise.all([
+    prisma.playerHistory.findMany({ where: { id: { in: allPlayerIds } } }),
+    prisma.teamStrength.findMany()
+  ]);
+  
+  const historyMap = new Map(historyRecords.map(h => [h.id, h]));
+  const teamStrengthMap = new Map(teamStrengths.map(t => [t.id, t]));
 
-  let outcome;
+  const squadSignals = buildPlayerSignals(bootstrap as never, fixtures as never, squadPlayerIds, historyMap, teamStrengthMap);
+  const candidateSignals = buildPlayerSignals(bootstrap as never, fixtures as never, candidatePlayerIds, historyMap, teamStrengthMap);
+
+  // 1. Math Solver Engine
+  const solverResult = solveTransfers(squadSignals, candidateSignals, bank, freeTransfers, allowHits);
+
+  // 2. Analyst LLM
+  const messages = buildTransferPrompt(squadSignals, candidateSignals, solverResult, freeTransfers, bank);
+
+  let aiResult: TransferResponse;
+  let modelUsed: string;
+
   try {
-    outcome = await generateWithValidation<TransferResponse>(messages, (aiResult) => {
-      if (aiResult.transfersOut.length !== aiResult.transfersIn.length) {
-        return { valid: false, errors: ["transfersOut and transfersIn must be the same length"] };
-      }
-      if (!allowHits && aiResult.transfersMade > freeTransfers) {
-        return { valid: false, errors: [`The user disallowed hits — transfersMade must be ≤ ${freeTransfers}`] };
-      }
-      const resultingIds = squadPlayerIds
-        .filter((id) => !aiResult.transfersOut.includes(id))
-        .concat(aiResult.transfersIn);
-      if (new Set(resultingIds).size !== 15) {
-        return { valid: false, errors: ["Resulting squad doesn't have 15 unique players"] };
-      }
-      const resultingPlayers = toSquadPlayers(bootstrap as never, resultingIds);
-      return validateTransfer(resultingPlayers, previousSquadValue, bank);
-    });
+    const outcome = await generateNarration<TransferResponse>(messages, [
+      "summary",
+      "detail",
+      "perPlayer",
+    ]);
+    aiResult = outcome.result;
+    modelUsed = outcome.modelUsed;
   } catch (err) {
     return recommendationErrorResponse(err);
   }
 
-  const { result: aiResult, modelUsed, selfCorrected } = outcome;
+  // Enforce solver's math
+  aiResult.transfersOut = solverResult.transfersOut;
+  aiResult.transfersIn = solverResult.transfersIn;
+  aiResult.transfersMade = solverResult.transfersMade;
+  aiResult.hitWorthIt = solverResult.transfersMade > freeTransfers;
+
   const hitCost = computeTransferCost(aiResult.transfersMade, freeTransfers);
   const incomingPlayers = Object.fromEntries(
     candidateSignals
@@ -101,7 +111,6 @@ export async function POST(request: Request) {
         hitWorthIt: aiResult.hitWorthIt,
         hitCost,
         perPlayer: aiResult.perPlayer,
-        selfCorrected,
       },
     },
   });
@@ -116,5 +125,5 @@ export async function POST(request: Request) {
     void sendEmail({ to: { address: session.user.email }, subject, html }).catch(console.error);
   }
 
-  return NextResponse.json({ recommendation, aiResult, hitCost, selfCorrected, incomingPlayers });
+  return NextResponse.json({ recommendation, aiResult, hitCost, incomingPlayers });
 }

@@ -28,6 +28,7 @@ export type DisplayPlayer = {
   availability?: "available" | "doubtful" | "unavailable";
   isCaptain?: boolean;
   isViceCaptain?: boolean;
+  expectedPoints?: number;
   // Live points for the gameweek shown on the Points page: raw score before
   // the captain/triple-captain multiplier is applied.
   gwPoints?: number;

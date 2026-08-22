@@ -14,6 +14,36 @@ import type { DisplayPlayer, StoredPick } from "@/types/ui";
 import type { Position } from "@/types/fpl";
 
 type Slot = { originalId: number; player: DisplayPlayer };
+type SortKey = "xpts" | "price" | "form" | "points";
+type PositionFilter = Position | "ALL";
+
+const POSITION_FILTERS: { key: PositionFilter; label: string }[] = [
+  { key: "GK", label: "GK" },
+  { key: "DEF", label: "DEF" },
+  { key: "MID", label: "MID" },
+  { key: "FWD", label: "FWD" },
+  { key: "ALL", label: "All" },
+];
+
+const SORT_OPTIONS: { key: SortKey; label: string }[] = [
+  { key: "xpts", label: "xPts" },
+  { key: "price", label: "Price" },
+  { key: "form", label: "Form" },
+  { key: "points", label: "Pts" },
+];
+
+function sortValue(p: DisplayPlayer, key: SortKey): number {
+  switch (key) {
+    case "xpts":
+      return p.expectedPoints ?? p.points ?? p.form ?? 0;
+    case "price":
+      return p.price;
+    case "form":
+      return p.form ?? 0;
+    case "points":
+      return p.points ?? 0;
+  }
+}
 
 export function ManualTransferFlow({
   squad,
@@ -30,6 +60,8 @@ export function ManualTransferFlow({
     originalSquad.map((p) => ({ originalId: p.id, player: playerById.get(p.id) ?? p })),
   );
   const [swappingSlot, setSwappingSlot] = useState<Slot | null>(null);
+  const [positionFilter, setPositionFilter] = useState<PositionFilter>("GK");
+  const [sortKey, setSortKey] = useState<SortKey>("xpts");
   const [query, setQuery] = useState("");
   const [freeTransfers, setFreeTransfers] = useState(1);
   const [saving, setSaving] = useState(false);
@@ -45,6 +77,7 @@ export function ManualTransferFlow({
   const currentSquadIds = new Set(slots.map((s) => s.player.id));
   const totalValue = slots.reduce((sum, s) => sum + s.player.price, 0);
   const availableFunds = originalValue + squad.bank;
+  const currentBank = availableFunds - totalValue;
 
   const validation = validateFullSquad(
     slots.map((s) => ({ id: s.player.id, position: s.player.position, club: s.player.club, price: s.player.price })),
@@ -55,19 +88,32 @@ export function ManualTransferFlow({
     if (!swappingSlot) return [];
     const q = query.trim().toLowerCase();
     return allPlayers
-      .filter((p) => p.position === swappingSlot.player.position)
+      .filter((p) => positionFilter === "ALL" || p.position === positionFilter)
       .filter((p) => !currentSquadIds.has(p.id))
       .filter((p) => !q || p.name.toLowerCase().includes(q))
-      .sort((a, b) => (b.points ?? b.form ?? 0) - (a.points ?? a.form ?? 0))
+      .sort((a, b) => sortValue(b, sortKey) - sortValue(a, sortKey))
       .slice(0, 25);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [swappingSlot, query, allPlayers]);
+  }, [swappingSlot, query, allPlayers, positionFilter, sortKey]);
+
+  // Opens the swap picker for a slot, defaulting the position filter to that
+  // slot's current position (today's behavior) while still letting the user
+  // switch to browse other positions — validateFullSquad (above) is the real
+  // gate against an invalid final formation/budget, so this is safe to allow.
+  function startSwap(slot: Slot) {
+    setSwappingSlot(slot);
+    setPositionFilter(slot.player.position);
+    setSortKey("xpts");
+    setQuery("");
+  }
+
+  function applySwap(slot: Slot, incoming: DisplayPlayer) {
+    setSlots((prev) => prev.map((s) => (s.originalId === slot.originalId ? { ...s, player: incoming } : s)));
+  }
 
   function swap(incoming: DisplayPlayer) {
     if (!swappingSlot) return;
-    setSlots((prev) =>
-      prev.map((s) => (s.originalId === swappingSlot.originalId ? { ...s, player: incoming } : s)),
-    );
+    applySwap(swappingSlot, incoming);
     setSwappingSlot(null);
     setQuery("");
   }
@@ -82,6 +128,18 @@ export function ManualTransferFlow({
 
   function openDetail(slot: Slot) {
     const player = playerById.get(slot.player.id) ?? slot.player;
+
+    // Deterministic "who should replace this player" shortlist: same
+    // position, affordable under the current single-swap budget, ranked by
+    // xPts — same ranking the swap picker itself sorts by.
+    const suggestions = allPlayers
+      .filter((p) => p.position === player.position)
+      .filter((p) => !currentSquadIds.has(p.id))
+      .filter((p) => currentBank + player.price >= p.price)
+      .sort((a, b) => (b.expectedPoints ?? 0) - (a.expectedPoints ?? 0))
+      .slice(0, 3)
+      .map((p) => ({ id: p.id, name: p.name, club: p.club, price: p.price, expectedPoints: p.expectedPoints }));
+
     setDetail({
       id: player.id,
       name: player.name,
@@ -98,8 +156,24 @@ export function ManualTransferFlow({
       actionLabel: "Transfer this player",
       onAction: () => {
         setDetail(null);
-        setSwappingSlot(slot);
+        startSwap(slot);
       },
+      suggestions,
+      onPickSuggestion: (id) => {
+        const incoming = playerById.get(id);
+        if (!incoming) return;
+        applySwap(slot, incoming);
+        setDetail(null);
+      },
+      swapContext:
+        suggestions.length > 0
+          ? {
+              outPlayerId: player.id,
+              squadPlayerIds: slots.map((s) => s.player.id),
+              bank: currentBank,
+              gameweek: squad.gameweek,
+            }
+          : undefined,
     });
   }
 
@@ -273,7 +347,7 @@ export function ManualTransferFlow({
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            setSwappingSlot(slot);
+                            startSwap(slot);
                           }}
                           className="cap rounded-lg border border-border bg-surface-2 px-3 py-1.5 text-xs font-bold text-accent"
                           type="button"
@@ -312,7 +386,7 @@ export function ManualTransferFlow({
         {swappingSlot && (
           <>
             <div className="fixed inset-0 z-30 bg-black/65" onClick={() => setSwappingSlot(null)} />
-            <div className="fixed inset-x-0 bottom-0 z-40 max-h-[80vh] overflow-y-auto rounded-t-3xl border border-border bg-surface-3 p-5 pb-8 shadow-2xl md:inset-x-auto md:left-1/2 md:top-1/2 md:max-w-md md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl">
+            <div className="fixed inset-x-0 bottom-0 z-40 max-h-[80vh] overflow-y-auto rounded-t-3xl border border-border bg-surface-3 p-5 pb-8 shadow-2xl md:inset-x-auto md:left-1/2 md:top-1/2 md:max-w-2xl md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl">
               <div className="mb-3 flex items-center justify-between">
                 <div className="cap text-xl font-bold">Transfer player</div>
                 <button onClick={() => setSwappingSlot(null)} className="text-text-muted" type="button">
@@ -321,43 +395,86 @@ export function ManualTransferFlow({
               </div>
               <div className="mb-2 text-sm text-text-muted">
                 Out: <b className="text-text">{swappingSlot.player.name}</b> · {swappingSlot.player.position} ·
-                £{swappingSlot.player.price.toFixed(1)}
+                £{swappingSlot.player.price.toFixed(1)} · Bank £{currentBank.toFixed(1)}m
               </div>
               <div className="mb-4">
                 <FixtureChips fixtures={playerById.get(swappingSlot.player.id)?.upcomingFixtures} />
               </div>
+
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <div className="flex gap-1 rounded-xl border border-border bg-surface-2 p-1">
+                  {POSITION_FILTERS.map((opt) => (
+                    <button
+                      key={opt.key}
+                      onClick={() => setPositionFilter(opt.key)}
+                      className={`cap rounded-lg px-2.5 py-1 text-xs font-bold ${
+                        positionFilter === opt.key ? "bg-accent text-accent-ink" : "text-text-muted"
+                      }`}
+                      type="button"
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex gap-1 rounded-xl border border-border bg-surface-2 p-1">
+                  {SORT_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.key}
+                      onClick={() => setSortKey(opt.key)}
+                      className={`cap rounded-lg px-2.5 py-1 text-xs font-bold ${
+                        sortKey === opt.key ? "bg-accent text-accent-ink" : "text-text-muted"
+                      }`}
+                      type="button"
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <input
                 autoFocus
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder={`Search ${swappingSlot.player.position.toLowerCase()}s…`}
+                placeholder="Search players…"
                 className="mb-4 w-full rounded-xl border border-border bg-surface-2 px-4 py-3 text-[15px] outline-none focus:border-accent"
               />
-              <div className="flex flex-col divide-y divide-border-soft">
-                {searchResults.map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => swap(p)}
-                    className="flex items-center gap-3 py-2.5 text-left"
-                    type="button"
-                  >
-                    <ClubBadge club={p.club} size={32} />
-                    <div className="min-w-0 flex-1">
-                      <div className="cap text-[15px] font-semibold leading-tight">{p.name}</div>
-                      <div className="text-[11px] text-text-dim">
-                        Form {p.form?.toFixed(1) ?? "–"} · {p.ownership?.toFixed(0) ?? 0}% owned
+              <div className="flex flex-col divide-y divide-border-soft md:grid md:grid-cols-2 md:gap-2 md:divide-y-0">
+                {searchResults.map((p) => {
+                  const affordable = currentBank + swappingSlot.player.price >= p.price;
+                  return (
+                    <button
+                      key={p.id}
+                      onClick={() => swap(p)}
+                      className={`flex items-center gap-3 py-2.5 text-left md:rounded-xl md:border md:border-border-soft md:px-2.5 ${
+                        affordable ? "" : "opacity-45"
+                      }`}
+                      type="button"
+                    >
+                      <ClubBadge club={p.club} size={32} />
+                      <div className="min-w-0 flex-1">
+                        <div className="cap text-[15px] font-semibold leading-tight">{p.name}</div>
+                        <div className="text-[11px] text-text-dim">
+                          {p.expectedPoints !== undefined && (
+                            <span className="font-semibold text-accent">{p.expectedPoints.toFixed(1)} xPts</span>
+                          )}
+                          {p.expectedPoints !== undefined && " · "}
+                          Form {p.form?.toFixed(1) ?? "–"} · {p.ownership?.toFixed(0) ?? 0}% owned
+                        </div>
+                        <div className="mt-1">
+                          <FixtureChips fixtures={p.upcomingFixtures} />
+                        </div>
                       </div>
-                      <div className="mt-1">
-                        <FixtureChips fixtures={p.upcomingFixtures} />
-                      </div>
-                    </div>
-                    <span className="cap ml-1 shrink-0 text-sm font-semibold text-accent">
-                      £{p.price.toFixed(1)}
-                    </span>
-                  </button>
-                ))}
+                      <span
+                        className={`cap ml-1 shrink-0 text-sm font-semibold ${affordable ? "text-accent" : "text-text-dim"}`}
+                      >
+                        £{p.price.toFixed(1)}
+                      </span>
+                    </button>
+                  );
+                })}
                 {searchResults.length === 0 && (
-                  <p className="py-4 text-center text-sm text-text-dim">No matches.</p>
+                  <p className="py-4 text-center text-sm text-text-dim md:col-span-2">No matches.</p>
                 )}
               </div>
             </div>

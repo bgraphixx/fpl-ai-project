@@ -78,9 +78,16 @@ function PlayerPointsRow({ player, onClick }: { player: DisplayPlayer; onClick: 
         </div>
         <div className="text-[11px] text-text-dim">{player.position}</div>
       </div>
-      <div className="cap text-right text-[15px] font-bold">
-        {contribution}
-        {multiplier > 1 && <span className="ml-1 text-xs text-text-dim">({raw} × {multiplier})</span>}
+      <div className="flex flex-col items-end">
+        <div className="cap text-right text-[15px] font-bold">
+          {contribution}
+          {multiplier > 1 && <span className="ml-1 text-xs text-text-dim">({raw} × {multiplier})</span>}
+        </div>
+        {player.expectedPoints !== undefined && (
+          <div className="text-[11px] font-medium text-accent-deep mt-0.5">
+            {player.expectedPoints.toFixed(1)} xPts
+          </div>
+        )}
       </div>
     </button>
   );
@@ -90,6 +97,9 @@ export function PointsView({ squad }: { squad: CurrentSquad }) {
   const [view, setView] = useState<"pitch" | "table">("pitch");
   const [detail, setDetail] = useState<PlayerDetail | null>(null);
   const benchPoints = squad.bench.reduce((sum, p) => sum + (p.gwPoints ?? 0), 0);
+  const livePoints = squad.starting.reduce((sum, p) => sum + ((p.gwPoints ?? 0) * (p.multiplier ?? 1)), 0);
+  const netLivePoints = livePoints - (squad.transferCost ?? 0);
+  const totalXp = squad.starting.reduce((sum, p) => sum + ((p.expectedPoints ?? 0) * (p.multiplier ?? 1)), 0);
 
   // Group starting XI by position for table view
   const startingGroups = POSITION_ORDER.map(({ key, label }) => ({
@@ -107,10 +117,22 @@ export function PointsView({ squad }: { squad: CurrentSquad }) {
         </div>
 
         <div className="rounded-2xl border border-success-deep bg-gradient-to-br from-[#14351f] to-[#0c1c13] p-5">
-          <div className="cap text-xs font-bold uppercase tracking-widest text-accent">
-            Gameweek {squad.pointsGameweek}
+          <div className="flex items-center justify-between">
+            <div className="cap text-xs font-bold uppercase tracking-widest text-accent">
+              Gameweek {squad.pointsGameweek}
+            </div>
+            <div className="text-xs font-semibold text-accent-deep">
+              {totalXp.toFixed(1)} Expected Pts
+            </div>
           </div>
-          <div className="cap mt-1.5 text-5xl font-bold leading-none">{squad.points ?? "–"}</div>
+          <div className="cap mt-1.5 flex items-end gap-3 leading-none">
+            <span className="text-5xl font-bold">{netLivePoints}</span>
+            {(squad.transferCost ?? 0) > 0 && (
+              <span className="mb-1 text-lg font-semibold text-text-dim">
+                ({livePoints} pts)
+              </span>
+            )}
+          </div>
           {squad.points === null && (
             <p className="mt-1 text-xs text-[#cdd8d1]">
               No live score yet — this squad hasn&apos;t been synced from FPL. Hit Refresh.

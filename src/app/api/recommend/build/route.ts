@@ -44,7 +44,16 @@ export async function POST(request: Request) {
     getFixtures(gameweek),
     getTransferCandidates([]),
   ]);
-  const candidateSignals = buildPlayerSignals(bootstrap as never, fixtures as never, candidatePlayerIds);
+
+  const [historyRecords, teamStrengths] = await Promise.all([
+    prisma.playerHistory.findMany({ where: { id: { in: candidatePlayerIds } } }),
+    prisma.teamStrength.findMany()
+  ]);
+  
+  const historyMap = new Map(historyRecords.map(h => [h.id, h]));
+  const teamStrengthMap = new Map(teamStrengths.map(t => [t.id, t]));
+
+  const candidateSignals = buildPlayerSignals(bootstrap as never, fixtures as never, candidatePlayerIds, historyMap, teamStrengthMap);
 
   const messages = buildSquadPrompt(candidateSignals, budget);
 

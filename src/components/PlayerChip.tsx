@@ -51,6 +51,11 @@ export function PlayerChip({
         <div className="cap truncate text-[11px] font-semibold leading-tight sm:text-[12px]">
           {player.name}
         </div>
+        {player.expectedPoints !== undefined && (
+          <div className="text-[9px] font-medium text-accent-deep bg-accent/10 rounded-sm mx-auto w-max px-1 mb-0.5">
+            {player.expectedPoints.toFixed(1)} xPts
+          </div>
+        )}
         {showPoints ? (
           <div className="cap text-[11px] font-bold text-accent">
             {(player.gwPoints ?? 0) * (player.multiplier ?? 1)} pts

@@ -5,6 +5,14 @@ import { ClubBadge } from "@/components/ClubBadge";
 import { FixtureChips } from "@/components/FixtureChips";
 import type { UpcomingFixture } from "@/types/ui";
 
+export type SuggestedReplacement = {
+  id: number;
+  name: string;
+  club: string;
+  price: number;
+  expectedPoints?: number;
+};
+
 export type PlayerDetail = {
   id: number;
   name: string;
@@ -22,9 +30,17 @@ export type PlayerDetail = {
   fetchHistory?: boolean;
   actionLabel?: string;
   onAction?: () => void;
+  // Manual Transfers only: a deterministic xPts-ranked "who should replace
+  // this player" shortlist, each row tappable via onPickSuggestion. Paired
+  // with swapContext, a "Consult AI" button lazy-calls /api/recommend/swap
+  // for a reasoned pick on top of the same deterministic list.
+  suggestions?: SuggestedReplacement[];
+  onPickSuggestion?: (id: number) => void;
+  swapContext?: { outPlayerId: number; squadPlayerIds: number[]; bank: number; gameweek: number };
 };
 
 type History = { seasonTotal: number; last3: { round: number; totalPoints: number }[] };
+type SwapAiResult = { suggested: SuggestedReplacement; reasoning: string };
 
 const TONE_CLASSES = {
   accent: "text-accent",
@@ -47,6 +63,9 @@ export function PlayerDetailPanel({
   // state for whichever one is open now, and "loading" is simply "we don't
   // have a result for this id yet" rather than a separately-tracked flag.
   const [historyFor, setHistoryFor] = useState<{ id: number; data: History | null } | null>(null);
+  // "idle" until the user taps Consult AI (unlike history, this costs an LLM
+  // call, so it's opt-in rather than auto-fetched on open).
+  const [aiSwap, setAiSwap] = useState<{ id: number; status: "loading" | "done" | "error"; result?: SwapAiResult }>();
 
   useEffect(() => {
     if (!detail?.fetchHistory) return;
@@ -60,6 +79,20 @@ export function PlayerDetailPanel({
 
   const loadingHistory = Boolean(detail.fetchHistory) && historyFor?.id !== detail.id;
   const history = historyFor?.id === detail.id ? historyFor.data : null;
+  const aiForThisPlayer = aiSwap?.id === detail.id ? aiSwap : undefined;
+
+  function consultAI() {
+    if (!detail?.swapContext) return;
+    setAiSwap({ id: detail.id, status: "loading" });
+    fetch("/api/recommend/swap", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(detail.swapContext),
+    })
+      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
+      .then((data: SwapAiResult) => setAiSwap({ id: detail.id, status: "done", result: data }))
+      .catch(() => setAiSwap({ id: detail.id, status: "error" }));
+  }
 
   return (
     <>
@@ -143,6 +176,60 @@ export function PlayerDetailPanel({
               </div>
             ) : (
               <p className="text-sm text-text-dim">Couldn&apos;t load history.</p>
+            )}
+          </div>
+        )}
+
+        {detail.suggestions && detail.suggestions.length > 0 && (
+          <div className="mb-3.5">
+            <div className="mb-1.5 flex items-center justify-between">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-text-dim">
+                Suggested replacements
+              </div>
+              {detail.swapContext && aiForThisPlayer?.status !== "done" && (
+                <button
+                  onClick={consultAI}
+                  disabled={aiForThisPlayer?.status === "loading"}
+                  type="button"
+                  className="cap text-[11px] font-bold text-accent disabled:opacity-50"
+                >
+                  {aiForThisPlayer?.status === "loading" ? "Asking AI…" : "✨ Consult AI"}
+                </button>
+              )}
+            </div>
+            <div className="flex flex-col gap-1.5">
+              {detail.suggestions.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => detail.onPickSuggestion?.(s.id)}
+                  type="button"
+                  className="flex items-center gap-2.5 rounded-[10px] border border-border-soft bg-surface p-2 text-left hover:border-accent/50"
+                >
+                  <ClubBadge club={s.club} size={28} />
+                  <div className="min-w-0 flex-1">
+                    <div className="cap truncate text-[13px] font-semibold leading-tight">{s.name}</div>
+                    {s.expectedPoints !== undefined && (
+                      <div className="text-[11px] text-accent">{s.expectedPoints.toFixed(1)} xPts</div>
+                    )}
+                  </div>
+                  <span className="cap shrink-0 text-[13px] font-semibold text-accent">£{s.price.toFixed(1)}</span>
+                </button>
+              ))}
+            </div>
+            {aiForThisPlayer?.status === "error" && (
+              <p className="mt-2 text-sm text-text-dim">Couldn&apos;t reach the AI — try again shortly.</p>
+            )}
+            {aiForThisPlayer?.status === "done" && aiForThisPlayer.result && (
+              <div className="mt-2 rounded-[10px] border border-accent/30 bg-surface p-2.5">
+                <p className="mb-2 text-sm leading-relaxed text-[#cdd8d1]">{aiForThisPlayer.result.reasoning}</p>
+                <button
+                  onClick={() => detail.onPickSuggestion?.(aiForThisPlayer.result!.suggested.id)}
+                  type="button"
+                  className="cap text-[12px] font-bold text-accent"
+                >
+                  Use {aiForThisPlayer.result.suggested.name} →
+                </button>
+              </div>
             )}
           </div>
         )}

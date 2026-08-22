@@ -63,6 +63,25 @@ export async function generateWithValidation<T>(
   throw new InvalidAIProposalError(["AI did not return valid JSON after retrying"]);
 }
 
+// Lighter-weight variant for the solver-backed routes (XI, Transfer): a
+// math solver already guarantees the picks obey FPL rules, so this only
+// needs to retry when the model returns malformed JSON or omits a required
+// narration field — not re-validate squad legality. Still gets the same
+// re-prompt-and-retry behavior and error mapping as generateWithValidation.
+export async function generateNarration<T extends Record<string, unknown>>(
+  messages: ChatMessage[],
+  requiredKeys: (keyof T)[],
+): Promise<{ result: T; modelUsed: string }> {
+  const { result, modelUsed } = await generateWithValidation<T>(messages, (parsed) => {
+    const missing = requiredKeys.filter((key) => parsed[key] === undefined);
+    if (missing.length > 0) {
+      return { valid: false, errors: [`Missing required field(s): ${missing.join(", ")}`] };
+    }
+    return { valid: true, errors: [] };
+  });
+  return { result, modelUsed };
+}
+
 // Shared error → HTTP response mapping for the three /api/recommend/* routes.
 export function recommendationErrorResponse(err: unknown): NextResponse {
   if (err instanceof InvalidAIProposalError) {

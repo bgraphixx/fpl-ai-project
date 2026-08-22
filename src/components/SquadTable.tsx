@@ -5,10 +5,11 @@ import { ClubBadge } from "@/components/ClubBadge";
 import type { DisplayPlayer } from "@/types/ui";
 import type { Position } from "@/types/fpl";
 
-type SortKey = "price" | "form" | "points";
+type SortKey = "price" | "xpts" | "form" | "points";
 
 const COLUMNS: { key: SortKey; label: string }[] = [
   { key: "price", label: "£" },
+  { key: "xpts", label: "xPts" },
   { key: "form", label: "Form" },
   { key: "points", label: "Pts" },
 ];
@@ -33,7 +34,11 @@ export function SquadTable({
     return POSITION_ORDER.map(({ key, label }) => {
       const group = players
         .filter((p) => p.position === key)
-        .sort((a, b) => (b[sortKey] ?? 0) - (a[sortKey] ?? 0));
+        .sort((a, b) => {
+          const valA = sortKey === "xpts" ? a.expectedPoints : a[sortKey];
+          const valB = sortKey === "xpts" ? b.expectedPoints : b[sortKey];
+          return (valB ?? 0) - (valA ?? 0);
+        });
       return { key, label, players: group };
     }).filter((g) => g.players.length > 0);
   }, [players, sortKey]);
@@ -74,6 +79,9 @@ export function SquadTable({
                 </div>
                 <span className="cap w-14 text-right text-[15px] font-semibold text-accent">
                   {p.price.toFixed(1)}
+                </span>
+                <span className="cap w-14 text-right text-[15px] font-semibold">
+                  {p.expectedPoints?.toFixed(1) ?? "–"}
                 </span>
                 <span className="cap w-14 text-right text-[15px] font-semibold">
                   {p.form?.toFixed(1) ?? "–"}

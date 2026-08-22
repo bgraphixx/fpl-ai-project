@@ -2,8 +2,10 @@ import { prisma } from "@/lib/prisma";
 import { getBootstrapStatic, getEntryPicks, getEventLive, getFixtures } from "@/lib/fpl";
 import { pickableGameweek, targetGameweek } from "@/lib/gameweek";
 import { computeUpcomingFixtures, type Fixture } from "@/lib/fixtures-lookahead";
+import { computeExpectedPointsForElement } from "@/lib/signals";
 import type { DisplayPlayer, StoredPick } from "@/types/ui";
 import type { Position } from "@/types/fpl";
+import type { PlayerHistory, TeamStrength } from "@prisma/client";
 
 const POSITION_MAP: Record<number, Position> = { 1: "GK", 2: "DEF", 3: "MID", 4: "FWD" };
 
@@ -14,8 +16,17 @@ type BootstrapElement = {
   element_type: number;
   now_cost: number;
   form: string;
+  points_per_game: string;
   selected_by_percent: string;
   chance_of_playing_this_round: number | null;
+  news: string;
+  expected_goals: string;
+  expected_assists: string;
+  expected_goal_involvements: string;
+  expected_goals_conceded: string;
+  bps: number;
+  minutes: number;
+  cost_change_event: number;
   total_points: number;
 };
 
@@ -105,6 +116,8 @@ function joinDisplaySquad(
   bootstrap: Bootstrap,
   live: FplLiveResponse | null,
   fixtures?: Fixture[],
+  historyMap?: Map<number, PlayerHistory>,
+  teamStrengthMap?: Map<number, TeamStrength>,
 ): { starting: DisplayPlayer[]; bench: DisplayPlayer[] } {
   const teamById = new Map(bootstrap.teams.map((t) => [t.id, t.short_name]));
   const elementById = new Map(bootstrap.elements.map((e) => [e.id, e]));
@@ -115,11 +128,29 @@ function joinDisplaySquad(
     if (!el) return null; // player no longer exists in bootstrap (rare)
     const chance = el.chance_of_playing_this_round;
     const liveEl = liveById.get(pick.id);
+    const position = POSITION_MAP[el.element_type] ?? "MID";
+
+    const upcomingFixtures = fixtures ? computeUpcomingFixtures(fixtures, el.team, teamById) : undefined;
+
+    const history = historyMap?.get(el.id);
+    const teamStrength = teamStrengthMap?.get(el.team);
+    const opponentTeam = bootstrap.teams.find((t) => t.short_name === upcomingFixtures?.[0]?.opponent);
+    const opponentStrength = opponentTeam ? teamStrengthMap?.get(opponentTeam.id) : undefined;
+
+    const expectedPoints = computeExpectedPointsForElement(
+      el,
+      position,
+      upcomingFixtures ?? [],
+      history,
+      teamStrength,
+      opponentStrength,
+    );
+
     return {
       id: el.id,
       name: el.web_name,
       club: teamById.get(el.team) ?? "UNK",
-      position: POSITION_MAP[el.element_type] ?? "MID",
+      position,
       price: el.now_cost / 10,
       form: Number(el.form) || 0,
       points: el.total_points,
@@ -127,10 +158,11 @@ function joinDisplaySquad(
       availability: chance === null || chance >= 75 ? "available" : chance >= 25 ? "doubtful" : "unavailable",
       isCaptain: pick.isCaptain,
       isViceCaptain: pick.isViceCaptain,
+      expectedPoints,
       gwPoints: liveEl?.stats.total_points,
       multiplier: pick.isCaptain ? 2 : 1,
       gwStatsBreakdown: liveEl?.explain[0]?.stats,
-      upcomingFixtures: fixtures ? computeUpcomingFixtures(fixtures, el.team, teamById) : undefined,
+      upcomingFixtures,
     };
   };
 
@@ -164,6 +196,13 @@ export async function refreshSquadFromFpl(userId: string): Promise<CurrentSquad>
     isBench: p.multiplier === 0,
   }));
 
+  const [historyRecords, teamStrengths] = await Promise.all([
+    prisma.playerHistory.findMany({ where: { id: { in: storedPicks.map(p => p.id) } } }),
+    prisma.teamStrength.findMany()
+  ]);
+  const historyMap = new Map(historyRecords.map(h => [h.id, h]));
+  const teamStrengthMap = new Map(teamStrengths.map(t => [t.id, t]));
+
   const snapshot = await prisma.squadSnapshot.create({
     data: {
       userId: user.id,
@@ -180,7 +219,7 @@ export async function refreshSquadFromFpl(userId: string): Promise<CurrentSquad>
     },
   });
 
-  const { starting, bench } = joinDisplaySquad(storedPicks, bootstrap, live, fixtures);
+  const { starting, bench } = joinDisplaySquad(storedPicks, bootstrap, live, fixtures, historyMap, teamStrengthMap);
 
   return {
     gameweek: targetGw.id,
@@ -221,7 +260,15 @@ export async function getStoredSquad(userId: string): Promise<CurrentSquad | nul
     : null;
 
   const storedPicks = snapshot.players as unknown as StoredPick[];
-  const { starting, bench } = joinDisplaySquad(storedPicks, bootstrap, live, fixtures);
+  
+  const [historyRecords, teamStrengths] = await Promise.all([
+    prisma.playerHistory.findMany({ where: { id: { in: storedPicks.map(p => p.id) } } }),
+    prisma.teamStrength.findMany()
+  ]);
+  const historyMap = new Map(historyRecords.map(h => [h.id, h]));
+  const teamStrengthMap = new Map(teamStrengths.map(t => [t.id, t]));
+
+  const { starting, bench } = joinDisplaySquad(storedPicks, bootstrap, live, fixtures, historyMap, teamStrengthMap);
 
   return {
     gameweek: targetGw?.id ?? snapshot.gameweek,
@@ -299,8 +346,8 @@ export async function getTransferCandidates(
   return candidates;
 }
 
-// Every player in the game, with upcoming fixtures — for the squad-edit and
-// manual-transfer search sheets.
+// Every player in the game, with upcoming fixtures and xPts — for the
+// squad-edit and manual-transfer search sheets.
 export async function getAllPlayers(): Promise<DisplayPlayer[]> {
   const [bootstrap, fixtures] = await Promise.all([
     getBootstrapStatic() as Promise<Bootstrap>,
@@ -308,20 +355,45 @@ export async function getAllPlayers(): Promise<DisplayPlayer[]> {
   ]);
   const teamById = new Map(bootstrap.teams.map((t) => [t.id, t.short_name]));
 
+  const [historyRecords, teamStrengths] = await Promise.all([
+    prisma.playerHistory.findMany(),
+    prisma.teamStrength.findMany(),
+  ]);
+  const historyMap = new Map(historyRecords.map((h) => [h.id, h]));
+  const teamStrengthMap = new Map(teamStrengths.map((t) => [t.id, t]));
+
   return bootstrap.elements.map((el) => {
     const chance = el.chance_of_playing_this_round;
+    const position = POSITION_MAP[el.element_type] ?? "MID";
+    const upcomingFixtures = computeUpcomingFixtures(fixtures, el.team, teamById);
+
+    const history = historyMap.get(el.id);
+    const teamStrength = teamStrengthMap.get(el.team);
+    const opponentTeam = bootstrap.teams.find((t) => t.short_name === upcomingFixtures[0]?.opponent);
+    const opponentStrength = opponentTeam ? teamStrengthMap.get(opponentTeam.id) : undefined;
+
+    const expectedPoints = computeExpectedPointsForElement(
+      el,
+      position,
+      upcomingFixtures,
+      history,
+      teamStrength,
+      opponentStrength,
+    );
+
     return {
       id: el.id,
       name: el.web_name,
       club: teamById.get(el.team) ?? "UNK",
-      position: POSITION_MAP[el.element_type] ?? "MID",
+      position,
       price: el.now_cost / 10,
       form: Number(el.form) || 0,
       points: el.total_points,
       ownership: Number(el.selected_by_percent) || 0,
       availability:
         chance === null || chance >= 75 ? "available" : chance >= 25 ? "doubtful" : "unavailable",
-      upcomingFixtures: computeUpcomingFixtures(fixtures, el.team, teamById),
+      expectedPoints,
+      upcomingFixtures,
     };
   });
 }

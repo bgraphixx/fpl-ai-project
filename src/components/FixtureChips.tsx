@@ -19,14 +19,20 @@ export function FixtureChips({
       ? "cap rounded px-1 py-px text-[9px] font-bold"
       : "cap rounded px-1.5 py-0.5 text-[11px] font-bold";
 
+  const isSmall = size === "sm";
+
   return (
-    <div className="flex flex-wrap gap-1">
+    <div className={`flex ${isSmall ? "w-full flex-col items-stretch gap-[2px]" : "flex-wrap gap-1"}`}>
       {fixtures.map((f, i) => {
         const { bg, fg } = fdrColor(f.difficulty);
         return (
-          <span key={i} className={chipClass} style={{ background: bg, color: fg }}>
+          <div
+            key={i}
+            className={`${chipClass} ${isSmall ? "text-center" : ""}`}
+            style={{ background: bg, color: fg }}
+          >
             {f.opponent} {f.isHome ? "(H)" : "(A)"}
-          </span>
+          </div>
         );
       })}
     </div>

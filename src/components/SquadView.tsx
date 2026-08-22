@@ -56,11 +56,18 @@ export function SquadView({ squad, deadline }: { squad: CurrentSquad; deadline: 
 
         <div className="flex items-center justify-between">
           <h1 className="cap text-2xl font-bold">Pick Team</h1>
-          <div className="flex items-center gap-3 text-sm text-text-muted">
-            <span>£{squad.bank.toFixed(1)}m ITB</span>
-            <Link href="/squad/edit" className="cap font-semibold text-accent">
-              Edit ›
-            </Link>
+          <div className="flex flex-col items-end gap-1 text-sm text-text-muted">
+            <div className="flex items-center gap-3">
+              <span>£{squad.bank.toFixed(1)}m ITB</span>
+              <Link href="/squad/edit" className="cap font-semibold text-accent">
+                Edit ›
+              </Link>
+            </div>
+            <div className="text-[11px] font-medium bg-surface-2 px-2 py-0.5 rounded-full text-text-muted border border-border">
+              XI xPts: <span className="font-bold text-accent">{squad.starting.reduce((sum, p) => sum + (p.expectedPoints || 0), 0).toFixed(1)}</span>
+              <span className="text-text-dim mx-1.5">|</span>
+              Squad: <span className="font-bold text-accent">{all.reduce((sum, p) => sum + (p.expectedPoints || 0), 0).toFixed(1)}</span>
+            </div>
           </div>
         </div>
         <RefreshSquadButton lastSyncedAt={squad.lastSyncedAt} />
