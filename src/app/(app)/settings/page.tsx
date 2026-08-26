@@ -41,9 +41,16 @@ export default async function SettingsPage() {
             </div>
             <span className="cap text-sm font-semibold text-accent">Change</span>
           </Link>
-          <Link href="/squad" className="flex items-center justify-between px-4 py-3.5">
+          <Link href="/squad" className="flex items-center justify-between border-b border-border-soft px-4 py-3.5">
             <div className="cap text-[15px] font-semibold">Re-sync squad now</div>
             <span className="text-text-muted">↻</span>
+          </Link>
+          <Link href="/build" className="flex items-center justify-between px-4 py-3.5">
+            <div>
+              <div className="cap text-[15px] font-semibold">Build squad from scratch</div>
+              <div className="text-[13px] text-text-dim">New team, wildcard, or free hit</div>
+            </div>
+            <span className="text-text-dim">›</span>
           </Link>
         </div>
       </div>

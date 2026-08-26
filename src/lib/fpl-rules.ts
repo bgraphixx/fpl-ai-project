@@ -1,8 +1,9 @@
 import type { Position, SquadPlayer, ValidationResult } from "@/types/fpl";
+import type { DisplayPlayer } from "@/types/ui";
 
-const SQUAD_SIZE: Record<Position, number> = { GK: 2, DEF: 5, MID: 5, FWD: 3 };
+export const SQUAD_SIZE: Record<Position, number> = { GK: 2, DEF: 5, MID: 5, FWD: 3 };
 const MAX_PER_CLUB = 3;
-const MAX_SQUAD_VALUE = 100.0;
+export const MAX_SQUAD_VALUE = 100.0;
 const HIT_COST_PER_TRANSFER = 4;
 
 // FPL currently allows any starting XI with 1 GK, 3-5 DEF, 2-5 MID, 1-3 FWD
@@ -120,4 +121,58 @@ export function validateTransfer(
 ): ValidationResult {
   const availableFunds = previousSquadValue + bank;
   return validateFullSquad(resultingSquad, availableFunds);
+}
+
+export type BestXIResult = {
+  startingIds: number[];
+  benchIds: number[];
+  captainId: number;
+  viceCaptainId: number;
+};
+
+// Deterministically picks the highest-xPts legal starting XI (+ captain/vice)
+// out of a full 15-man squad. For a fixed pair of group sizes (d DEF, m MID,
+// f FWD), the best selection is always "the top d/m/f players in each group
+// by xPts" — so trying every legal (d, m, f) combination and keeping the
+// highest-scoring one is optimal, without needing the LP solver (solveStartingXI
+// in solver-models.ts) that the AI recommendation routes use server-side.
+export function pickBestStartingXI(squad: DisplayPlayer[]): BestXIResult {
+  const byPosition = (pos: Position) =>
+    squad.filter((p) => p.position === pos).sort((a, b) => (b.expectedPoints ?? 0) - (a.expectedPoints ?? 0));
+
+  const gk = byPosition("GK");
+  const def = byPosition("DEF");
+  const mid = byPosition("MID");
+  const fwd = byPosition("FWD");
+
+  let best: { ids: number[]; total: number } | null = null;
+  for (let d = MIN_DEF; d <= Math.min(MAX_DEF, def.length); d++) {
+    for (let m = MIN_MID; m <= Math.min(MAX_MID, mid.length); m++) {
+      const f = 10 - d - m;
+      if (f < MIN_FWD || f > MAX_FWD || f > fwd.length || gk.length < 1) continue;
+      const chosen = [gk[0], ...def.slice(0, d), ...mid.slice(0, m), ...fwd.slice(0, f)];
+      const total = chosen.reduce((sum, p) => sum + (p.expectedPoints ?? 0), 0);
+      if (!best || total > best.total) best = { ids: chosen.map((p) => p.id), total };
+    }
+  }
+  if (!best) throw new Error("pickBestStartingXI: no legal starting XI could be formed from this squad");
+
+  const startingSet = new Set(best.ids);
+  const bench = squad.filter((p) => !startingSet.has(p.id));
+  // Bench order: reserve GK first (FPL convention), then outfield reserves by xPts.
+  const benchGK = bench.filter((p) => p.position === "GK");
+  const benchOutfield = bench
+    .filter((p) => p.position !== "GK")
+    .sort((a, b) => (b.expectedPoints ?? 0) - (a.expectedPoints ?? 0));
+
+  const startingByXpts = squad
+    .filter((p) => startingSet.has(p.id))
+    .sort((a, b) => (b.expectedPoints ?? 0) - (a.expectedPoints ?? 0));
+
+  return {
+    startingIds: best.ids,
+    benchIds: [...benchGK, ...benchOutfield].map((p) => p.id),
+    captainId: startingByXpts[0].id,
+    viceCaptainId: startingByXpts[1].id,
+  };
 }

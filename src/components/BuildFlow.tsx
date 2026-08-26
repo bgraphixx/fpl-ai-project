@@ -201,9 +201,8 @@ export function BuildFlow({ gameweek }: { gameweek: number }) {
 
   return (
     <div className="flex flex-1 flex-col gap-4">
-      <h1 className="cap text-2xl font-bold">Build a squad</h1>
       <p className="text-[15px] leading-relaxed text-text-muted">
-        A full 15 from nothing — new team, wildcard or free hit.
+        Let AI draft the full 15 for you — new team, wildcard or free hit.
       </p>
 
       <Card>

@@ -1,6 +1,7 @@
 import { getBootstrapStatic } from "@/lib/fpl";
 import { targetGameweek } from "@/lib/gameweek";
-import { BuildFlow } from "@/components/BuildFlow";
+import { getAllPlayers } from "@/lib/squad";
+import { BuildContainer } from "@/components/BuildContainer";
 import { StateScreen } from "@/components/StateScreen";
 
 type BootstrapStatic = {
@@ -32,5 +33,7 @@ export default async function BuildPage() {
     );
   }
 
-  return <BuildFlow gameweek={gameweek} />;
+  const allPlayers = await getAllPlayers();
+
+  return <BuildContainer gameweek={gameweek} allPlayers={allPlayers} />;
 }

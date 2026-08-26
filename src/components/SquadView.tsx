@@ -276,20 +276,12 @@ export function SquadView({ squad, deadline }: { squad: CurrentSquad; deadline: 
           />
         )}
 
-        <div className="flex flex-col gap-2.5 sm:flex-row">
-          <Link
-            href="/xi"
-            className="cap flex flex-1 items-center justify-center gap-2 rounded-xl border border-success-deep bg-gradient-to-br from-[#123021] to-[#0f2418] px-4 py-3 text-[15px] font-bold text-accent"
-          >
-            ✨ Ask AI for my XI
-          </Link>
-          <Link
-            href="/build"
-            className="cap flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-2 px-4 py-3 text-[15px] font-bold text-text-muted"
-          >
-            Build from scratch
-          </Link>
-        </div>
+        <Link
+          href="/xi"
+          className="cap flex items-center justify-center gap-2 rounded-xl border border-success-deep bg-gradient-to-br from-[#123021] to-[#0f2418] px-4 py-3 text-[15px] font-bold text-accent"
+        >
+          ✨ Ask AI for my XI
+        </Link>
       </div>
 
       <PlayerDetailPanel detail={detail} onClose={() => setDetail(null)} />
